@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SATUKEY by Aswadi AI — One Key, All Models (OpenAI & Claude Code Gateway Indonesia)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #07090e;
+      color: #f1f5f9;
+      background-image:
+        radial-gradient(at 15% 5%, rgba(16, 185, 129, 0.12) 0px, transparent 45%),
+        radial-gradient(at 85% 10%, rgba(59, 130, 246, 0.10) 0px, transparent 45%),
+        radial-gradient(at 50% 90%, rgba(139, 92, 246, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card {
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.85) 0%, rgba(10, 14, 23, 0.92) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(16, 185, 129, 0.35);
+      transform: translateY(-2px);
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #07090e; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-emerald-500 selection:text-slate-950">
+
+  <!-- TOP ANNOUNCEMENT BANNER -->
+  <div class="bg-gradient-to-r from-emerald-950/90 via-slate-900 to-blue-950/90 border-b border-emerald-500/20 text-xs py-2 px-4">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">PROMO 2026</span>
+        <span class="text-slate-200">Deposit Pertama PAYG dapat <strong>Welcome Bonus +40% Saldo</strong>! Pembayaran Otomatis 24 Jam via <strong>SeaBank (901482290090)</strong> & <strong>QRIS Dinamis</strong>.</span>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Gateway Online (99.98%)</span>
+        <a href="#playground" onclick="switchMainView('home')" class="text-emerald-400 hover:underline font-medium">Coba Live Playground →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-40 glass border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchMainView('home')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 font-mono font-extrabold text-slate-950 text-lg">
+          SK
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="navBrandName" class="font-extrabold text-lg tracking-tight text-white">SATUKEY</span>
+            <span id="navBrandSub" class="text-xs px-2 py-0.5 rounded-md bg-white/5 text-emerald-400 border border-emerald-500/20 font-medium">by Aswadi AI</span>
+          </div>
+          <p id="navDomain" class="text-[11px] font-mono text-slate-400">https://ai.aswadi.my.id/v1</p>
+        </div>
+      </div>
+
+      <nav class="hidden lg:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-white/5 text-xs font-medium">
+        <button onclick="switchMainView('home')" id="tabBtn-home" class="px-3.5 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold transition">Beranda & Harga</button>
+        <a href="#playground" onclick="switchMainView('home')" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition">Live Demo</a>
+        <a href="#bansos" onclick="switchMainView('home')" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition">Bansos Key</a>
+        <a href="#ratelive" onclick="switchMainView('home')" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition">Rate Live</a>
+        <button onclick="switchMainView('dashboard')" id="tabBtn-dashboard" class="px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
+          <span>Dashboard & API Key</span>
+        </button>
+        <button onclick="switchMainView('admin')" id="tabBtn-admin" class="px-3.5 py-2 rounded-lg text-amber-300 hover:bg-amber-500/10 transition flex items-center gap-1.5">
+          <span>⚙️ Admin Panel</span>
+        </button>
+      </nav>
+
+      <!-- AUTH & WALLET CONTROLS -->
+      <div class="flex items-center gap-2.5">
+        <div id="userWalletBar" class="hidden items-center gap-2 bg-slate-900/90 border border-emerald-500/30 rounded-xl px-3 py-1.5">
+          <div class="text-right">
+            <div class="text-[10px] text-slate-400 leading-none" id="currentUserEmail">demo@aswadi.my.id</div>
+            <div class="text-xs font-mono font-bold text-emerald-400 mt-0.5" id="currentUserBalance">Rp 75.000</div>
+          </div>
+          <button onclick="openTopupModal()" class="ml-1 px-2.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow">
+            + Top Up
+          </button>
+        </div>
+
+        <div id="guestAuthButtons" class="flex items-center gap-2">
+          <button onclick="quickDemoLogin('user')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-300 border border-emerald-500/20 transition">
+            ⚡ Akun Demo
+          </button>
+          <button onclick="openAuthModal()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-emerald-500/20">
+            Masuk / Daftar
+          </button>
+        </div>
+
+        <button id="logoutBtn" onclick="logoutUser()" class="hidden px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-300 text-xs border border-white/10 transition" title="Keluar">
+          Keluar
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Bar -->
+    <div class="flex lg:hidden items-center justify-around border-t border-white/5 bg-slate-950/90 px-2 py-2 text-xs">
+      <button onclick="switchMainView('home')" class="px-3 py-1.5 rounded-lg text-emerald-400 font-semibold">Beranda</button>
+      <button onclick="switchMainView('dashboard')" class="px-3 py-1.5 rounded-lg text-slate-300">Dashboard Key</button>
+      <button onclick="openTopupModal()" class="px-3 py-1.5 rounded-lg text-emerald-300 font-semibold">+ Top Up SeaBank</button>
+      <button onclick="switchMainView('admin')" class="px-3 py-1.5 rounded-lg text-amber-300">⚙️ Admin</button>
+    </div>
+  </header>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: PUBLIC LANDING PAGE (HERO, CODE TABS, PLAYGROUND, BANSOS, PRICING, RATE LIVE) -->
+  <!-- ===================================================================== -->
+  <main id="view-home" class="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-16">
+
+    <!-- HERO SECTION -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
+          <span>🇮🇩 #1 Enterprise AI API Gateway Indonesia</span>
+          <span class="text-slate-500">•</span>
+          <span>Support Cursor, Claude Code, Cline, Roo Code</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.12] text-white">
+          Satu API Key untuk <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">Semua Model AI Terbaik</span> Dunia.
+        </h1>
+
+        <p id="heroTagline" class="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
+          One Key, All Models — Akses <strong>Claude Sonnet 4.5</strong>, <strong>GPT-5 Codex</strong>, <strong>Gemini 2.5 Pro</strong>, <strong>DeepSeek V4.1</strong>, hingga <strong>Qwen 3 Coder</strong> tanpa kartu kredit internasional. Pembayaran instan via <strong>SeaBank</strong> & <strong>QRIS Rupiah</strong>, kontrol kuota & RPM per-key.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3 pt-1">
+          <button onclick="claimFreeStarterKey()" class="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/20 transition flex items-center gap-2">
+            <span>🚀 Klaim Free 3.000.000 Token</span>
+          </button>
+          <a href="#pricing" class="px-5 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-sm border border-white/10 transition">
+            Lihat Paket Unlimited (Mulai Rp 25rb)
+          </a>
+          <button onclick="openTopupModal()" class="px-4 py-3.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 font-semibold text-sm border border-blue-500/30 transition">
+            💳 Top-Up SeaBank / QRIS
+          </button>
+        </div>
+
+        <!-- KEY METRICS -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4">
+          <div class="glass-card rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Base Endpoint</div>
+            <div class="text-sm font-mono font-bold text-emerald-400 truncate mt-0.5">ai.aswadi.my.id/v1</div>
+          </div>
+          <div class="glass-card rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Total Request</div>
+            <div id="statTotalCalls" class="text-lg font-mono font-extrabold text-white mt-0.5">14,824+</div>
+          </div>
+          <div class="glass-card rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Avg Latency</div>
+            <div id="statAvgLatency" class="text-lg font-mono font-extrabold text-emerald-400 mt-0.5">340 ms</div>
+          </div>
+          <div class="glass-card rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Metode Bayar</div>
+            <div class="text-sm font-bold text-cyan-300 mt-0.5">SeaBank & QRIS</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MULTI-IDE LIVE CONFIG SNIPPETS -->
+      <div class="lg:col-span-5 glass-card rounded-2xl p-5 border border-emerald-500/25 shadow-2xl">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+            <span class="text-xs font-mono text-slate-300 ml-2">Integrasi Instan (Drop-in Replacement)</span>
+          </div>
+          <button onclick="toggleSnippetHost()" id="snippetHostToggle" class="text-[11px] font-mono px-2 py-1 rounded bg-slate-800 text-emerald-400 border border-emerald-500/30 hover:bg-slate-700" title="Klik untuk ganti URL produksi / lokal">
+            URL: ai.aswadi.my.id
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5 mb-3" id="codeTabs">
+          <button onclick="selectCodeTab('cursor')" id="codeTab-cursor" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950">Cursor IDE</button>
+          <button onclick="selectCodeTab('claudecode')" id="codeTab-claudecode" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Claude Code</button>
+          <button onclick="selectCodeTab('cline')" id="codeTab-cline" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Cline / Roo</button>
+          <button onclick="selectCodeTab('openai')" id="codeTab-openai" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">OpenAI SDK</button>
+          <button onclick="selectCodeTab('curl')" id="codeTab-curl" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">cURL</button>
+        </div>
+
+        <div class="relative">
+          <pre id="codeSnippetContent" class="bg-slate-950/95 text-emerald-300 font-mono text-xs p-4 rounded-xl overflow-x-auto border border-white/10 leading-relaxed min-h-[210px]"></pre>
+          <button onclick="copyCodeSnippet()" class="absolute top-3 right-3 px-2.5 py-1 rounded-lg bg-slate-800/90 hover:bg-emerald-500 hover:text-slate-950 text-xs font-mono text-slate-200 border border-white/10 transition">
+            Salin Config
+          </button>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-400">
+          <span>✅ Mendukung Streaming SSE & Function Calling</span>
+          <span class="font-mono text-emerald-400">/v1/chat/completions & /v1/messages</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE LIVE PLAYGROUND (NO LOGIN REQUIRED) -->
+    <section id="playground" class="glass-card rounded-2xl p-6 border border-white/10">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold">LIVE PLAYGROUND</span>
+            <h2 class="text-xl font-bold text-white">Uji Coba Model AI Secara Langsung</h2>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Tanpa perlu login — rasakan kecepatan respon router SATUKEY sekarang juga.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="text-xs text-slate-400">Model:</label>
+          <select id="demoModelSelect" class="bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-xs font-mono text-emerald-300 focus:outline-none focus:border-emerald-500">
+            <option value="claude-sonnet-4.5">claude-sonnet-4.5 (Flagship Coding)</option>
+            <option value="gpt-5-codex">gpt-5-codex (Agentic)</option>
+            <option value="gemini-2.5-pro">gemini-2.5-pro (1M Context)</option>
+            <option value="deepseek-v4.1-flash">deepseek-v4.1-flash (Ultra Fast)</option>
+            <option value="grok-4.7">grok-4.7 (xAI)</option>
+            <option value="mimo-v2.6-flash">mimo-v2.6-flash (Low Latency)</option>
+            <option value="qwen-3-coder-plus">qwen-3-coder-plus (Coder)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-5 space-y-3">
+          <div class="text-xs font-semibold text-slate-300">Prompt Cepat:</div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="setDemoPrompt('Halo! Tes status koneksi dan latensi SATUKEY AI Gateway.')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 border border-white/10 transition">⚡ Ping & Status</button>
+            <button onclick="setDemoPrompt('Buatkan fungsi Python async untuk memanggil API OpenAI compatible dengan retry otomatis.')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 border border-white/10 transition">🐍 Kode Python</button>
+            <button onclick="setDemoPrompt('Jelaskan cara setting Base URL di Cursor IDE dan Claude Code menggunakan SATUKEY.')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 border border-white/10 transition">🛠️ Cara Pakai di Cursor</button>
+          </div>
+
+          <textarea id="demoPromptInput" rows="4" class="w-full bg-slate-950 border border-white/10 rounded-xl p-3.5 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="Ketik perintah atau pertanyaan coding di sini...">Halo! Tes status koneksi dan latensi SATUKEY AI Gateway.</textarea>
+
+          <button onclick="runDemoChat()" id="demoSendBtn" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20">
+            ▶ Kirim Request ke Gateway
+          </button>
+        </div>
+
+        <div class="lg:col-span-7 flex flex-col">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+            <span>Output Response:</span>
+            <span id="demoTelemetryBadge" class="font-mono text-emerald-400">Ready • /v1/chat/completions</span>
+          </div>
+          <div id="demoOutputBox" class="flex-1 bg-slate-950/90 border border-white/10 rounded-xl p-4 font-mono text-xs text-slate-200 whitespace-pre-wrap overflow-y-auto min-h-[210px] max-h-[300px]">Klik "Kirim Request ke Gateway" untuk melihat respon real-time dari model pilihan Anda.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BANSOS COMMUNITY SHARED API KEY WIDGET -->
+    <section id="bansos" class="glass-card rounded-2xl p-6 border border-emerald-500/30 bg-gradient-to-r from-emerald-950/30 via-slate-900/90 to-slate-900/90">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-7 space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold">
+            🎁 PROGRAM BANSOS KOMUNITAS (GRATIS BERSAMA)
+          </div>
+          <h3 class="text-2xl font-extrabold text-white">API Key Bansos Bersama — Kuota 2.000.000.000 Token!</h3>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Ingin langsung coba di <strong>Cursor</strong>, <strong>Cline</strong>, atau <strong>Claude Code</strong> detik ini juga? Salin API Key komunitas di bawah ini. Disediakan gratis untuk komunitas developer Indonesia dan di-reset berkala!
+          </p>
+          <div class="flex flex-wrap items-center gap-2 pt-1">
+            <code id="bansosKeyDisplay" class="px-3.5 py-2.5 rounded-xl bg-slate-950 border border-emerald-500/30 font-mono text-xs sm:text-sm text-emerald-300 select-all">sk-satukey-bansos-9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a</code>
+            <button onclick="copyBansosKey()" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">
+              📋 Salin Key Bansos
+            </button>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-slate-950/80 rounded-xl p-5 border border-white/10 space-y-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-400 font-medium">Pemakaian Kuota Komunitas</span>
+            <span id="bansosUsagePercent" class="font-mono font-bold text-emerald-400">20.9% Terpakai</span>
+          </div>
+          <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
+            <div id="bansosProgressBar" class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full transition-all duration-500" style="width: 21%"></div>
+          </div>
+          <div class="flex items-center justify-between text-xs font-mono text-slate-300">
+            <span id="bansosUsedText">418.520.900 Token</span>
+            <span id="bansosTotalText">2.000.000.000 Token</span>
+          </div>
+          <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+            <span>Limit: <strong id="bansosRpmText" class="text-white">15 RPM / Concurrency 4</strong></span>
+            <a id="bansosTelegramLink" href="https://t.me/aswadi_ai" target="_blank" class="text-emerald-400 hover:underline font-semibold">Gabung Grup Telegram →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING PACKAGES SECTION -->
+    <section id="pricing" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">HARGA PAKET FLEKSIBEL (RUPIAH)</span>
+          <h2 class="text-3xl font-extrabold text-white mt-1">Pilih Paket Sesuai Ritme Coding Anda</h2>
+          <p class="text-sm text-slate-400 mt-1">Aktivasi otomatis 24/7 via <strong>SeaBank (901482290090 a/n M. ASWADI)</strong> dan <strong>QRIS Dinamis</strong>.</p>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="flex flex-wrap gap-1.5 bg-slate-900 p-1.5 rounded-xl border border-white/10 text-xs font-semibold">
+          <button onclick="filterPackages('all')" id="pkgFilter-all" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950">Semua Paket (10)</button>
+          <button onclick="filterPackages('unlimited')" id="pkgFilter-unlimited" class="px-3 py-1.5 rounded-lg text-slate-300 hover:bg-white/5">🔥 Unlimited</button>
+          <button onclick="filterPackages('token')" id="pkgFilter-token" class="px-3 py-1.5 rounded-lg text-slate-300 hover:bg-white/5">⚡ Kuota Token</button>
+          <button onclick="filterPackages('credit')" id="pkgFilter-credit" class="px-3 py-1.5 rounded-lg text-slate-300 hover:bg-white/5">🔄 Credit Regen</button>
+          <button onclick="filterPackages('payg')" id="pkgFilter-payg" class="px-3 py-1.5 rounded-lg text-slate-300 hover:bg-white/5">💰 PAYG (+40%)</button>
+        </div>
+      </div>
+
+      <div id="pricingGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <!-- Rendered dynamically from /api/public/config -->
+      </div>
+    </section>
+
+    <!-- SUPPORTED MODELS & RATE LIVE TELEMETRY -->
+    <section id="ratelive" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Model Catalog -->
+      <div class="lg:col-span-5 glass-card rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-white">Katalog Model Aktif (`/v1/models`)</h3>
+            <p class="text-xs text-slate-400">Semua model dapat diakses dengan 1 API Key yang sama</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 font-mono text-xs font-bold">Multi-Router</span>
+        </div>
+        <div id="modelsListContainer" class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1"></div>
+      </div>
+
+      <!-- Rate Live Stream -->
+      <div class="lg:col-span-7 glass-card rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <h3 class="text-lg font-bold text-white">Rate Live Telemetry (Real-Time)</h3>
+            </div>
+            <p class="text-xs text-slate-400">Deteksi otomatis client IDE (Cursor, Claude Code, Roo Code, Cline, Playground)</p>
+          </div>
+          <button onclick="loadPublicConfig()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-white/10">
+            ↻ Refresh
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-white/10 text-slate-400 font-mono">
+                <th class="py-2.5 px-2">Waktu</th>
+                <th class="py-2.5 px-2">Client IDE</th>
+                <th class="py-2.5 px-2">Model</th>
+                <th class="py-2.5 px-2">Endpoint</th>
+                <th class="py-2.5 px-2">Token</th>
+                <th class="py-2.5 px-2 text-right">Latency</th>
+              </tr>
+            </thead>
+            <tbody id="rateLiveTableBody" class="divide-y divide-white/5 font-mono"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: USER DASHBOARD (WALLET, API KEYS, INVOICES) -->
+  <!-- ===================================================================== -->
+  <main id="view-dashboard" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Dashboard Pengguna & API Key Manager</h1>
+        <p class="text-sm text-slate-400">Kelola API Key per-project, pantau kuota token, dan top-up saldo otomatis via SeaBank / QRIS.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="openTopupModal()" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20">
+          💳 + Top-Up Saldo (SeaBank / QRIS)
+        </button>
+        <button onclick="loadUserDashboard()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-white/10">
+          ↻ Sinkronkan Data
+        </button>
+      </div>
+    </div>
+
+    <!-- USER SUMMARY CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div class="glass-card rounded-2xl p-5 border border-emerald-500/30">
+        <div class="text-xs text-slate-400">Saldo Dompet Aktif (PAYG & Paket)</div>
+        <div id="dashBalance" class="text-3xl font-mono font-extrabold text-emerald-400 mt-1">Rp 0</div>
+        <div class="mt-3 flex items-center justify-between text-xs text-slate-400">
+          <span>Promo Deposit Pertama: <strong class="text-emerald-300">+40% Bonus</strong></span>
+          <button onclick="openTopupModal()" class="text-emerald-400 hover:underline font-semibold">Isi Saldo →</button>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-5">
+        <div class="text-xs text-slate-400">API Key Aktif</div>
+        <div id="dashActiveKeysCount" class="text-3xl font-mono font-extrabold text-white mt-1">0 Key</div>
+        <div class="mt-3 text-xs text-slate-400">
+          Format: <code class="text-emerald-300 font-mono">sk-satukey-...</code>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-5">
+        <div class="text-xs text-slate-400">Endpoint Gateway Anda</div>
+        <div class="text-sm font-mono font-bold text-cyan-300 mt-2 select-all">https://ai.aswadi.my.id/v1</div>
+        <div class="text-xs font-mono text-slate-400 mt-1 select-all">Lokal: http://127.0.0.1:3099/v1</div>
+      </div>
+    </div>
+
+    <!-- CREATE / ACTIVATE NEW API KEY -->
+    <div class="glass-card rounded-2xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-white">Buat / Aktifkan API Key Baru</h2>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+        <div class="md:col-span-5">
+          <label class="block text-xs text-slate-400 mb-1.5">Nama Key / Project (Misal: Cursor Laptop, Claude Code):</label>
+          <input id="newKeyName" type="text" placeholder="Contoh: Cursor Project Utama" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500" />
+        </div>
+        <div class="md:col-span-4">
+          <label class="block text-xs text-slate-400 mb-1.5">Pilih Paket Kuota / Unlimited:</label>
+          <select id="newKeyPackageSelect" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-emerald-300 font-mono focus:outline-none focus:border-emerald-500"></select>
+        </div>
+        <div class="md:col-span-3">
+          <button onclick="createNewUserKey()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20">
+            + Buat API Key Sekarang
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIST USER API KEYS -->
+    <div class="glass-card rounded-2xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-white">Daftar API Key Anda</h2>
+      <div id="userKeysContainer" class="space-y-3"></div>
+    </div>
+
+    <!-- USER INVOICES HISTORY -->
+    <div class="glass-card rounded-2xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-white">Riwayat Invoice & Pembayaran SeaBank / QRIS</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-white/10 text-slate-400 font-mono">
+              <th class="py-2.5 px-3">ID Invoice</th>
+              <th class="py-2.5 px-3">Paket / Tipe</th>
+              <th class="py-2.5 px-3">Nominal Unik (Rp)</th>
+              <th class="py-2.5 px-3">Metode</th>
+              <th class="py-2.5 px-3">Status</th>
+              <th class="py-2.5 px-3 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="userInvoicesTableBody" class="divide-y divide-white/5 font-mono"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 3: FULL ADMIN PANEL (SEABANK, QRIS, PACKAGES, UPSTREAMS, BANSOS, BRAND) -->
+  <!-- ===================================================================== -->
+  <main id="view-admin" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
+      <div>
+        <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold mb-1">
+          ADMINISTRATOR CONTROL CENTER
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Panel Admin SATUKEY AI Gateway</h1>
+        <p class="text-sm text-slate-400">Kelola Rekening SeaBank (`901482290090`), GoPay Merchant QRIS, Upstream Router (`9router`), Paket Harga, & Approval Invoice.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="quickDemoLogin('admin')" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+          🔑 Login Cepat Admin (admin@aswadi.my.id)
+        </button>
+        <button onclick="loadAdminOverview()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-white/10">
+          ↻ Refresh Admin Data
+        </button>
+      </div>
+    </div>
+
+    <!-- ADMIN INVOICE APPROVAL & SEABANK WEBHOOK SIMULATOR -->
+    <section class="glass-card rounded-2xl p-6 space-y-4 border border-emerald-500/30">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 class="text-lg font-bold text-white">1. Daftar Invoice Masuk (SeaBank 901482290090 & Dynamic QRIS)</h2>
+          <p class="text-xs text-slate-400">Sistem otomatis mencocokkan 3 digit kode unik via Webhook mutasi atau klik "Approve Lunas" secara manual.</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-white/10 text-slate-400 font-mono">
+              <th class="py-2.5 px-3">Invoice ID</th>
+              <th class="py-2.5 px-3">User Email</th>
+              <th class="py-2.5 px-3">Paket</th>
+              <th class="py-2.5 px-3">Nominal Unik</th>
+              <th class="py-2.5 px-3">Metode</th>
+              <th class="py-2.5 px-3">Status</th>
+              <th class="py-2.5 px-3 text-right">Kontrol Admin</th>
+            </tr>
+          </thead>
+          <tbody id="adminInvoicesTableBody" class="divide-y divide-white/5 font-mono"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PAYMENT SETTINGS: SEABANK & GOPAY MERCHANT DYNAMIC QRIS -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- SeaBank Config -->
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-white">2. Konfigurasi Bank Transfer (SeaBank)</h2>
+          <span class="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-xs font-mono">Kode Bank: 535</span>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="text-slate-400 block mb-1">Nama Bank:</label>
+            <input id="admSeabankName" type="text" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-mono" value="SeaBank Indonesia" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-slate-400 block mb-1">Nomor Rekening SeaBank:</label>
+              <input id="admSeabankNumber" type="text" class="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-3 py-2 text-emerald-300 font-mono font-bold" value="901482290090" />
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">Atas Nama (Account Holder):</label>
+              <input id="admSeabankHolder" type="text" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-mono font-bold" value="M. ASWADI" />
+            </div>
+          </div>
+          <div class="flex items-center gap-2 pt-1">
+            <input id="admSeabankAutoVerify" type="checkbox" checked class="w-4 h-4 accent-emerald-500" />
+            <label for="admSeabankAutoVerify" class="text-slate-300">Aktifkan Instant Receipt Verification (Otomatis Lunas saat tombol Verifikasi ditekan)</label>
+          </div>
+          <button onclick="saveAdminPaymentConfig()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">
+            💾 Simpan Konfigurasi SeaBank
+          </button>
+        </div>
+      </div>
+
+      <!-- GoPay Merchant Dynamic QRIS Config -->
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-white">3. GoPay Merchant / Dynamic QRIS Engine</h2>
+          <span class="px-2.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-xs font-mono">EMVCo CRC16</span>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-slate-400 block mb-1">Nama Merchant QRIS:</label>
+              <input id="admQrisMerchant" type="text" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-mono" value="ASWADI ACADEMY" />
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">NMID:</label>
+              <input id="admQrisNmid" type="text" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-mono" value="ID1026631733064" />
+            </div>
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Static QRIS String (Otomatis dikonversi ke Dynamic QRIS sesuai nominal unik):</label>
+            <textarea id="admQrisPayload" rows="3" class="w-full bg-slate-950 border border-white/15 rounded-xl p-2.5 text-[11px] text-emerald-300 font-mono"></textarea>
+          </div>
+          <button onclick="saveAdminPaymentConfig()" class="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition">
+            💾 Simpan Pengaturan GoPay Merchant QRIS
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPSTREAM ROUTER (9ROUTER POOL) & BANSOS ROTATION -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-7 glass-card rounded-2xl p-6 space-y-4">
+        <h2 class="text-lg font-bold text-white">4. Multi-Provider Upstream Pool (`9router` / OpenAI / Pollinations)</h2>
+        <div id="adminUpstreamsList" class="space-y-2.5"></div>
+
+        <div class="pt-3 border-t border-white/10 grid grid-cols-1 sm:grid-cols-12 gap-2.5 text-xs">
+          <input id="newUpName" type="text" placeholder="Nama Provider (Misal: Groq / 9Router)" class="sm:col-span-4 bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white" />
+          <input id="newUpUrl" type="text" placeholder="Base URL (https://.../v1)" class="sm:col-span-4 bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-mono" />
+          <input id="newUpKey" type="text" placeholder="API Key Upstream (Opsional)" class="sm:col-span-4 bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-mono" />
+          <button onclick="addAdminUpstream()" class="sm:col-span-12 py-2 rounded-xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-emerald-300 font-bold border border-emerald-500/30 transition">
+            + Tambah Endpoint Upstream Baru
+          </button>
+        </div>
+      </div>
+
+      <!-- Brand & Bansos Key Management -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="glass-card rounded-2xl p-6 space-y-3">
+          <h2 class="text-lg font-bold text-white">5. Rotasi API Key Bansos Komunitas</h2>
+          <p class="text-xs text-slate-400">Ganti API Key Bansos secara instan dan reset kuota 2.000.000.000 token.</p>
+          <button onclick="rotateAdminBansos()" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition">
+            🔄 Rotate Key Bansos & Reset Kuota (2 Miliar Token)
+          </button>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 space-y-3 text-xs">
+          <h2 class="text-lg font-bold text-white">6. Identitas Brand & Domain</h2>
+          <div>
+            <label class="text-slate-400 block mb-1">Nama Brand:</label>
+            <input id="admBrandName" type="text" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-bold" value="SATUKEY" />
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Tagline Utama:</label>
+            <input id="admBrandTagline" type="text" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white" />
+          </div>
+          <button onclick="saveAdminBrand()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">
+            💾 Update Brand Identity
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: TOP-UP & PACKAGE CHECKOUT (SEABANK 901482290090 + DYNAMIC QRIS) -->
+  <!-- ===================================================================== -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-card rounded-2xl max-w-lg w-full p-6 border border-emerald-500/30 shadow-2xl space-y-5 my-8">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div>
+          <span class="text-[11px] font-mono uppercase text-emerald-400 font-bold">PEMBAYARAN OTOMATIS 24 JAM</span>
+          <h3 id="modalTitle" class="text-lg font-extrabold text-white">Top-Up Saldo & Aktivasi Paket</h3>
+        </div>
+        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- STEP 1: CREATE INVOICE FORM -->
+      <div id="checkoutStepCreate" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1.5">Pilih Paket atau Top-Up Saldo PAYG:</label>
+          <select id="checkoutPkgSelect" onchange="onCheckoutPkgChange()" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-emerald-300 font-mono"></select>
+        </div>
+
+        <div id="checkoutCustomAmountWrap">
+          <label class="block text-xs text-slate-400 mb-1.5">Nominal Deposit (Rupiah):</label>
+          <div class="grid grid-cols-4 gap-2 mb-2">
+            <button type="button" onclick="setTopupAmount(20000)" class="py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-mono border border-white/10">Rp 20.000</button>
+            <button type="button" onclick="setTopupAmount(50000)" class="py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-mono border border-white/10">Rp 50.000</button>
+            <button type="button" onclick="setTopupAmount(100000)" class="py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-mono border border-white/10">Rp 100.000</button>
+            <button type="button" onclick="setTopupAmount(250000)" class="py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-mono border border-white/10">Rp 250.000</button>
+          </div>
+          <input id="checkoutAmountInput" type="number" value="28000" min="10000" step="1000" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-base font-mono font-bold text-white" />
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-200 space-y-1">
+          <div class="font-bold">✨ Sistem Kode Unik Otomatis (SeaBank & Dynamic QRIS)</div>
+          <p class="text-slate-300">Sistem akan menambahkan 3 digit kode unik (contoh: <code class="text-emerald-300">Rp 28.147</code>). Seluruh nominal termasuk kode unik langsung masuk ke saldo/paket Anda!</p>
+        </div>
+
+        <button onclick="generateInvoiceNow()" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition shadow-lg shadow-emerald-500/25">
+          Buat Invoice Pembayaran →
+        </button>
+      </div>
+
+      <!-- STEP 2: ACTIVE INVOICE DISPLAY (SEABANK 901482290090 & DYNAMIC QRIS TABS) -->
+      <div id="checkoutStepPay" class="hidden space-y-4">
+        <div class="flex items-center justify-between bg-slate-950/90 px-3.5 py-2.5 rounded-xl border border-white/10 text-xs">
+          <span id="invIdBadge" class="font-mono font-bold text-slate-300">INV-20261104-001</span>
+          <span id="invStatusBadge" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold">MENUNGGU TRANSFER</span>
+        </div>
+
+        <!-- Payment Method Switcher -->
+        <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1.5 rounded-xl border border-white/10 text-xs font-bold">
+          <button onclick="switchPayTab('seabank')" id="payTabBtn-seabank" class="py-2 rounded-lg bg-emerald-500 text-slate-950 transition">🏦 Transfer SeaBank</button>
+          <button onclick="switchPayTab('qris')" id="payTabBtn-qris" class="py-2 rounded-lg text-slate-300 hover:bg-white/5 transition">📱 QRIS Dinamis (GoPay)</button>
+        </div>
+
+        <!-- TAB A: SEABANK TRANSFER DETAILS -->
+        <div id="payTab-seabank" class="bg-slate-950/90 rounded-xl p-4 border border-emerald-500/30 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <div>
+              <div class="text-[11px] text-slate-400">Bank Tujuan (Cek Otomatis 24 Jam)</div>
+              <div id="invBankName" class="text-sm font-bold text-white">SeaBank Indonesia (Kode Bank: 535)</div>
+            </div>
+            <span class="px-2 py-1 rounded bg-orange-500/20 text-orange-300 font-mono text-xs font-bold">SEABANK</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-slate-400">Nomor Rekening SeaBank</div>
+              <div id="invBankAccount" class="text-xl font-mono font-extrabold text-emerald-400 tracking-wider select-all">901482290090</div>
+              <div class="text-xs text-slate-300 mt-0.5">A/N: <strong id="invBankHolder" class="text-white">M. ASWADI</strong></div>
+            </div>
+            <button onclick="copyTextValue('901482290090', 'Nomor Rekening SeaBank 901482290090 disalin!')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-xs font-mono font-semibold border border-white/10 transition">
+              Salin Rek
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB B: DYNAMIC QRIS (EMVCo CRC16) + OFFICIAL GOPAY MERCHANT POSTER -->
+        <div id="payTab-qris" class="hidden bg-slate-950/90 rounded-xl p-4 border border-cyan-500/30 text-center space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-cyan-300">QRIS GoPay Merchant: ASWADI ACADEMY</span>
+            <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-mono">NMID: ID1026631733064</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+            <div class="bg-slate-900/90 p-3 rounded-xl border border-white/10 space-y-1.5">
+              <div class="text-[11px] font-semibold text-emerald-300">⚡ QRIS Dinamis (Nominal Otomatis)</div>
+              <div id="qrisCanvasContainer" class="mx-auto w-44 h-44 bg-white p-2.5 rounded-xl flex items-center justify-center shadow-lg"></div>
+              <div class="text-[10px] text-slate-400">Nominal + Kode Unik langsung terkunci</div>
+            </div>
+            <div class="bg-slate-900/90 p-3 rounded-xl border border-white/10 space-y-1.5">
+              <div class="text-[11px] font-semibold text-cyan-300">🏪 Poster QRIS Resmi GoPay Merchant</div>
+              <a href="/qris_aswadi_academy.jpg" target="_blank" title="Klik untuk memperbesar QRIS ASWADI ACADEMY">
+                <img src="/qris_aswadi_academy.jpg" alt="QRIS ASWADI ACADEMY" class="mx-auto h-44 object-contain rounded-xl border border-cyan-500/30 shadow-lg hover:scale-105 transition" />
+              </a>
+              <div class="text-[10px] text-slate-400">Aswadi Academy • A01 (Klik perbesar)</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            Merchant: <strong id="invQrisMerchant" class="text-white">ASWADI ACADEMY</strong> • Scan via GoPay, SeaBank, BCA, Mandiri, BNI, BRI, Dana, OVO, ShopeePay
+          </div>
+          <div class="flex flex-wrap justify-center gap-2">
+            <button onclick="copyDynamicQrisPayload()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-mono text-cyan-300 border border-white/10">
+              Salin String EMVCo Dynamic QRIS
+            </button>
+            <a href="/qris_aswadi_academy.jpg" download="QRIS_ASWADI_ACADEMY.jpg" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-[11px] font-semibold text-cyan-300 border border-cyan-500/30">
+              ⬇ Unduh Gambar QRIS Resmi
+            </a>
+          </div>
+        </div>
+
+        <!-- EXACT UNIQUE AMOUNT BOX -->
+        <div class="bg-gradient-to-r from-emerald-950/70 to-slate-900 rounded-xl p-4 border border-emerald-500/40 flex items-center justify-between">
+          <div>
+            <div class="text-[11px] text-emerald-300 font-semibold">TRANSFER TEPAT HINGGA 3 DIGIT TERAKHIR:</div>
+            <div id="invAmountUniqueDisplay" class="text-2xl sm:text-3xl font-mono font-extrabold text-white mt-0.5 select-all">Rp 28.147</div>
+            <div id="invBonusBadge" class="text-[11px] text-emerald-400 mt-0.5">Kode Unik: #147 • Berlaku 30 Menit</div>
+          </div>
+          <button onclick="copyInvoiceExactAmount()" class="px-3.5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">
+            Salin Nominal
+          </button>
+        </div>
+
+        <!-- VERIFY RECEIPT / INSTANT CONFIRM BUTTON -->
+        <div class="space-y-2 pt-1">
+          <button onclick="verifyCurrentInvoiceNow()" id="verifyReceiptBtn" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition shadow-lg shadow-emerald-500/25">
+            ✅ Saya Sudah Transfer — Verifikasi & Aktifkan Sekarang
+          </button>
+          <button onclick="resetCheckoutModal()" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs text-slate-400">
+            ← Buat Invoice Lainnya
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: AUTH LOGIN / REGISTER MODAL -->
+  <!-- ===================================================================== -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-md w-full p-6 border border-white/15 space-y-5">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-lg font-extrabold text-white">Masuk / Daftar Akun SATUKEY</h3>
+        <button onclick="closeAuthModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300">✕</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-xl border border-white/10 text-xs font-bold">
+        <button onclick="switchAuthMode('login')" id="authTab-login" class="py-2 rounded-lg bg-emerald-500 text-slate-950">Masuk (Login)</button>
+        <button onclick="switchAuthMode('register')" id="authTab-register" class="py-2 rounded-lg text-slate-300">Daftar Gratis (+3 Juta Token)</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div id="authNameWrap" class="hidden">
+          <label class="text-slate-400 block mb-1">Nama Lengkap / Developer:</label>
+          <input id="authNameInput" type="text" placeholder="Nama Anda" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white" />
+        </div>
+        <div>
+          <label class="text-slate-400 block mb-1">Email:</label>
+          <input id="authEmailInput" type="email" value="demo@aswadi.my.id" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
+        </div>
+        <div>
+          <label class="text-slate-400 block mb-1">Password:</label>
+          <input id="authPassInput" type="password" value="demo123" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
+        </div>
+
+        <button onclick="submitAuthForm()" id="authSubmitBtn" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition">
+          Masuk ke Dashboard →
+        </button>
+
+        <div class="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+          <button onclick="quickDemoLogin('user'); closeAuthModal();" class="flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-semibold">
+            ⚡ 1-Klik Demo User
+          </button>
+          <button onclick="quickDemoLogin('admin'); closeAuthModal();" class="flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold">
+            🔑 1-Klik Admin
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-white/10 mt-20 py-10 text-xs text-slate-400 bg-slate-950/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <span class="font-bold text-white">SATUKEY by Aswadi AI</span> (`ai.aswadi.my.id`) — Unified OpenAI & Anthropic API Gateway Indonesia.
+      </div>
+      <div class="flex items-center gap-4 font-mono">
+        <span>SeaBank: 901482290090 (M. ASWADI)</span>
+        <span>•</span>
+        <a href="/v1/models" target="_blank" class="text-emerald-400 hover:underline">/v1/models</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- FRONTEND APPLICATION LOGIC -->
+  <!-- ===================================================================== -->
+  <script>
+    let appConfig = null;
+    let authToken = localStorage.getItem('satukey_token') || '';
+    let currentUser = null;
+    let activeCategoryFilter = 'all';
+    let activeCodeTab = 'cursor';
+    let useLocalUrlInSnippets = false;
+    let currentInvoice = null;
+    let authMode = 'login';
+
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      const colors = type === 'error'
+        ? 'bg-rose-950/95 border-rose-500/40 text-rose-200'
+        : 'bg-slate-900/95 border-emerald-500/40 text-emerald-200';
+      el.className = `px-4 py-3 rounded-xl border shadow-xl text-xs font-medium backdrop-blur-md transition-all ${colors}`;
+      el.innerHTML = msg;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4200);
+    }
+
+    function formatRp(num) {
+      return 'Rp ' + Math.round(Number(num) || 0).toLocaleString('id-ID');
+    }
+
+    function formatNum(num) {
+      return Math.round(Number(num) || 0).toLocaleString('id-ID');
+    }
+
+    function copyTextValue(text, toastMsg = 'Berhasil disalin ke clipboard!') {
+      navigator.clipboard.writeText(text);
+      showToast(`✅ ${toastMsg}`);
+    }
+
+    // -----------------------------------------------------------------------
+    // VIEW NAVIGATION
+    // -----------------------------------------------------------------------
+    function switchMainView(view) {
+      ['home', 'dashboard', 'admin'].forEach(v => {
+        document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
+        const btn = document.getElementById(`tabBtn-${v}`);
+        if (btn) {
+          if (v === view) {
+            btn.className = 'px-3.5 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold transition';
+          } else {
+            btn.className = 'px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition';
+          }
+        }
+      });
+
+      if (view === 'dashboard') {
+        if (!authToken) {
+          quickDemoLogin('user').then(() => loadUserDashboard());
+        } else {
+          loadUserDashboard();
+        }
+      } else if (view === 'admin') {
+        if (!currentUser || currentUser.role !== 'admin') {
+          quickDemoLogin('admin').then(() => loadAdminOverview());
+        } else {
+          loadAdminOverview();
+        }
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // CODE SNIPPETS GENERATOR
+    // -----------------------------------------------------------------------
+    function getGatewayBaseUrl() {
+      if (useLocalUrlInSnippets) {
+        return `${window.location.origin}/v1`;
+      }
+      return appConfig?.brand?.baseUrl || 'https://ai.aswadi.my.id/v1';
+    }
+
+    function getActiveUserKeySample() {
+      return appConfig?.bansos?.apiKey || 'sk-satukey-a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718';
+    }
+
+    function toggleSnippetHost() {
+      useLocalUrlInSnippets = !useLocalUrlInSnippets;
+      const btn = document.getElementById('snippetHostToggle');
+      btn.textContent = useLocalUrlInSnippets ? `URL: ${window.location.host}` : 'URL: ai.aswadi.my.id';
+      renderCodeSnippet();
+    }
+
+    function selectCodeTab(tab) {
+      activeCodeTab = tab;
+      ['cursor', 'claudecode', 'cline', 'openai', 'curl'].forEach(t => {
+        const btn = document.getElementById(`codeTab-${t}`);
+        if (btn) {
+          btn.className = t === tab
+            ? 'px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950'
+            : 'px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700';
+        }
+      });
+      renderCodeSnippet();
+    }
+
+    function renderCodeSnippet() {
+      const base = getGatewayBaseUrl();
+      const rootUrl = base.replace(/\/v1$/, '');
+      const key = getActiveUserKeySample();
+      const snippets = {
+        cursor: `# Setup di Cursor IDE (Settings -> Models):
+1. Override OpenAI Base URL : ${base}
+2. OpenAI API Key           : ${key}
+3. Tambahkan Custom Model   :
+   - claude-sonnet-4.5
+   - gpt-5-codex
+   - gemini-2.5-pro
+   - deepseek-v4.1-flash`,
+        claudecode: `# Jalankan Claude Code CLI di Terminal PowerShell / Bash:
+export ANTHROPIC_BASE_URL="${rootUrl}"
+export ANTHROPIC_AUTH_TOKEN="${key}"
+export ANTHROPIC_MODEL="claude-sonnet-4.5"
+
+claude`,
+        cline: `# Setup di Cline / Roo Code / Continue (VS Code):
+API Provider      : OpenAI Compatible
+Base URL          : ${base}
+API Key           : ${key}
+Model ID          : claude-sonnet-4.5`,
+        openai: `import OpenAI from 'openai';
+
+const client = new OpenAI({
+  baseURL: '${base}',
+  apiKey: '${key}'
+});
+
+const res = await client.chat.completions.create({
+  model: 'claude-sonnet-4.5',
+  messages: [{ role: 'user', content: 'Optimalkan kode ini!' }]
+});
+console.log(res.choices[0].message.content);`,
+        curl: `curl -X POST "${base}/chat/completions" \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer ${key}" \\
+  -d '{
+    "model": "claude-sonnet-4.5",
+    "messages": [{"role": "user", "content": "Halo SATUKEY!"}]
+  }'`
+      };
+      document.getElementById('codeSnippetContent').textContent = snippets[activeCodeTab] || snippets.cursor;
+    }
+
+    function copyCodeSnippet() {
+      const txt = document.getElementById('codeSnippetContent').textContent;
+      copyTextValue(txt, 'Konfigurasi kode berhasil disalin!');
+    }
+
+    // -----------------------------------------------------------------------
+    // LOAD PUBLIC CONFIG (BRAND, PACKAGES, MODELS, BANSOS, RATE LIVE)
+    // -----------------------------------------------------------------------
+    async function loadPublicConfig() {
+      try {
+        const res = await fetch('/api/public/config');
+        const data = await res.json();
+        if (!data.ok) return;
+        appConfig = data;
+
+        // Brand
+        document.getElementById('navBrandName').textContent = data.brand.name || 'SATUKEY';
+        document.getElementById('navBrandSub').textContent = data.brand.subtitle || 'by Aswadi AI';
+        document.getElementById('navDomain').textContent = data.brand.baseUrl || 'https://ai.aswadi.my.id/v1';
+        if (data.brand.tagline) {
+          document.getElementById('heroTagline').textContent = data.brand.tagline;
+        }
+
+        // Stats
+        document.getElementById('statTotalCalls').textContent = formatNum(data.stats.totalCalls) + '+';
+        document.getElementById('statAvgLatency').textContent = data.stats.avgLatencyMs + ' ms';
+
+        // Bansos
+        if (data.bansos) {
+          document.getElementById('bansosKeyDisplay').textContent = data.bansos.apiKey;
+          const pct = Math.min(100, ((data.bansos.usedTokens / data.bansos.totalQuota) * 100)).toFixed(1);
+          document.getElementById('bansosUsagePercent').textContent = `${pct}% Terpakai`;
+          document.getElementById('bansosProgressBar').style.width = `${Math.max(5, pct)}%`;
+          document.getElementById('bansosUsedText').textContent = `${formatNum(data.bansos.usedTokens)} Token`;
+          document.getElementById('bansosTotalText').textContent = `${formatNum(data.bansos.totalQuota)} Token`;
+          document.getElementById('bansosRpmText').textContent = `${data.bansos.rpmLimit} RPM / Concurrency ${data.bansos.concurrencyLimit}`;
+        }
+
+        renderCodeSnippet();
+        renderPricingCards();
+        renderModelsList();
+        renderRateLiveTable();
+        populatePackageSelects();
+      } catch (err) {
+        console.error('Failed loading public config:', err);
+      }
+    }
+
+    function filterPackages(cat) {
+      activeCategoryFilter = cat;
+      ['all', 'unlimited', 'token', 'credit', 'payg'].forEach(c => {
+        const btn = document.getElementById(`pkgFilter-${c}`);
+        if (btn) {
+          btn.className = c === cat
+            ? 'px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950'
+            : 'px-3 py-1.5 rounded-lg text-slate-300 hover:bg-white/5';
+        }
+      });
+      renderPricingCards();
+    }
+
+    function renderPricingCards() {
+      if (!appConfig?.packages) return;
+      const grid = document.getElementById('pricingGrid');
+      const list = activeCategoryFilter === 'all'
+        ? appConfig.packages
+        : appConfig.packages.filter(p => p.category === activeCategoryFilter);
+
+      grid.innerHTML = list.map(pkg => {
+        const isPop = pkg.popular;
+        const borderClass = isPop ? 'border-emerald-500/60 ring-1 ring-emerald-500/30' : 'border-white/10';
+        const priceDisplay = pkg.id === 'payg'
+          ? 'Mulai Rp 20.000'
+          : pkg.price === 0
+          ? 'GRATIS'
+          : formatRp(pkg.price);
+
+        const featuresHtml = (pkg.features || []).map(f =>
+          `<li class="flex items-start gap-2 text-xs text-slate-300"><span class="text-emerald-400 font-bold">✓</span><span>${f}</span></li>`
+        ).join('');
+
+        return `
+          <div class="glass-card rounded-2xl p-5 flex flex-col justify-between border ${borderClass}">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${isPop ? 'bg-emerald-500 text-slate-950' : 'bg-white/10 text-emerald-300'}">${pkg.badge || pkg.category.toUpperCase()}</span>
+                <span class="text-xs font-mono text-slate-400">${pkg.durationDays} Hari</span>
+              </div>
+              <div>
+                <h3 class="text-lg font-extrabold text-white">${pkg.name}</h3>
+                <div class="text-2xl font-mono font-extrabold text-emerald-400 mt-1">${priceDisplay}</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-950/90 border border-white/5 text-xs font-mono space-y-1">
+                <div class="text-white font-semibold">${pkg.tokenLabel}</div>
+                <div class="text-slate-400">Speed: <strong class="text-cyan-300">${pkg.rpmLimit} RPM</strong> • Concurrency: <strong class="text-cyan-300">${pkg.concurrencyLimit}</strong></div>
+              </div>
+              <ul class="space-y-2 pt-1">${featuresHtml}</ul>
+            </div>
+
+            <button onclick="selectPackageForPurchase('${pkg.id}')" class="mt-5 w-full py-2.5 rounded-xl ${isPop ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950' : 'bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-white'} font-bold text-xs transition">
+              ${pkg.price === 0 && pkg.id === 'free' ? '🚀 Klaim Paket Free' : '⚡ Pilih & Aktifkan Paket'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderModelsList() {
+      if (!appConfig?.models) return;
+      const container = document.getElementById('modelsListContainer');
+      container.innerHTML = appConfig.models.map(m => `
+        <div class="p-3 rounded-xl bg-slate-950/80 border border-white/5 flex items-center justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-xs text-emerald-300 select-all">${m.id}</span>
+              <span class="px-2 py-0.5 rounded bg-white/5 text-[10px] text-slate-300">${m.badge}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5">${m.provider} • Context ${(m.contextWindow / 1000)}K</div>
+          </div>
+          <button onclick="copyTextValue('${m.id}', 'Model ID ${m.id} disalin!')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono text-slate-300">
+            Copy ID
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderRateLiveTable() {
+      if (!appConfig?.usageLogs) return;
+      const tbody = document.getElementById('rateLiveTableBody');
+      const clientBadgeColors = {
+        'Cursor': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+        'Claude Code': 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+        'Roo Code': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+        'Cline': 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+        'Playground': 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+      };
+      tbody.innerHTML = appConfig.usageLogs.slice(0, 12).map(log => {
+        const timeStr = new Date(log.timestamp).toLocaleTimeString('id-ID');
+        const badgeStyle = clientBadgeColors[log.client] || 'bg-slate-800 text-slate-300 border-white/10';
+        return `
+          <tr class="hover:bg-white/[0.02]">
+            <td class="py-2.5 px-2 text-slate-400">${timeStr}</td>
+            <td class="py-2.5 px-2"><span class="px-2 py-0.5 rounded border text-[11px] font-semibold ${badgeStyle}">${log.client}</span></td>
+            <td class="py-2.5 px-2 text-emerald-300">${log.model}</td>
+            <td class="py-2.5 px-2 text-slate-400">${log.endpoint}</td>
+            <td class="py-2.5 px-2 text-slate-200">${formatNum(log.totalTokens)} tok</td>
+            <td class="py-2.5 px-2 text-right text-emerald-400 font-bold">${log.latencyMs} ms</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function populatePackageSelects() {
+      if (!appConfig?.packages) return;
+      const dashSel = document.getElementById('newKeyPackageSelect');
+      const chkSel = document.getElementById('checkoutPkgSelect');
+
+      if (dashSel) {
+        dashSel.innerHTML = appConfig.packages.map(p =>
+          `<option value="${p.id}">${p.name} — ${p.price === 0 ? 'Rp 0' : formatRp(p.price)} (${p.tokenLabel})</option>`
+        ).join('');
+      }
+      if (chkSel) {
+        chkSel.innerHTML = `<option value="payg">💰 Top-Up Saldo PAYG (Bebas Nominal + Bonus 40%)</option>` +
+          appConfig.packages.filter(p => p.price > 0).map(p =>
+            `<option value="${p.id}">📦 Paket ${p.name} — ${formatRp(p.price)} (${p.durationDays} Hari)</option>`
+          ).join('');
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // INTERACTIVE DEMO PLAYGROUND
+    // -----------------------------------------------------------------------
+    function setDemoPrompt(txt) {
+      document.getElementById('demoPromptInput').value = txt;
+    }
+
+    async function runDemoChat() {
+      const model = document.getElementById('demoModelSelect').value;
+      const prompt = document.getElementById('demoPromptInput').value.trim();
+      const out = document.getElementById('demoOutputBox');
+      const badge = document.getElementById('demoTelemetryBadge');
+      const btn = document.getElementById('demoSendBtn');
+
+      if (!prompt) return;
+      btn.disabled = true;
+      btn.textContent = '⏳ Memproses via Router SATUKEY...';
+      out.textContent = `Menghubungi model ${model}...`;
+
+      try {
+        const res = await fetch('/api/demo/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model, prompt })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          out.textContent = data.reply;
+          badge.textContent = `200 OK • ${data.latencyMs} ms • ${data.usage.totalTokens} Tokens • ${data.upstream}`;
+          loadPublicConfig();
+        } else {
+          out.textContent = 'Error: ' + (data.error || 'Unknown error');
+        }
+      } catch (err) {
+        out.textContent = 'Gagal menghubungi server: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '▶ Kirim Request ke Gateway';
+      }
+    }
+
+    function copyBansosKey() {
+      const key = document.getElementById('bansosKeyDisplay').textContent;
+      copyTextValue(key, 'API Key Bansos berhasil disalin! Siap dipakai di Cursor / Claude Code.');
+    }
+
+    // -----------------------------------------------------------------------
+    // AUTHENTICATION & DEMO LOGINS
+    // -----------------------------------------------------------------------
+    function openAuthModal() {
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+    function switchAuthMode(mode) {
+      authMode = mode;
+      document.getElementById('authNameWrap').classList.toggle('hidden', mode !== 'register');
+      document.getElementById('authTab-login').className = mode === 'login' ? 'py-2 rounded-lg bg-emerald-500 text-slate-950' : 'py-2 rounded-lg text-slate-300';
+      document.getElementById('authTab-register').className = mode === 'register' ? 'py-2 rounded-lg bg-emerald-500 text-slate-950' : 'py-2 rounded-lg text-slate-300';
+      document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Masuk ke Dashboard →' : 'Daftar & Klaim Free 3 Juta Token →';
+    }
+
+    async function submitAuthForm() {
+      const name = document.getElementById('authNameInput').value;
+      const email = document.getElementById('authEmailInput').value;
+      const password = document.getElementById('authPassInput').value;
+      const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        showToast(data.error || 'Gagal autentikasi', 'error');
+        return;
+      }
+      setLoggedInSession(data.token, data.user);
+      closeAuthModal();
+      showToast(`Selamat datang, ${data.user.name}!`);
+      switchMainView('dashboard');
+    }
+
+    async function quickDemoLogin(role = 'user') {
+      const res = await fetch('/api/auth/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setLoggedInSession(data.token, data.user);
+        showToast(`Login aktif sebagai ${data.user.email}`);
+      }
+    }
+
+    function setLoggedInSession(token, user) {
+      authToken = token;
+      currentUser = user;
+      localStorage.setItem('satukey_token', token);
+      updateNavbarAuthUI();
+    }
+
+    function logoutUser() {
+      authToken = '';
+      currentUser = null;
+      localStorage.removeItem('satukey_token');
+      updateNavbarAuthUI();
+      switchMainView('home');
+      showToast('Anda telah keluar.');
+    }
+
+    function updateNavbarAuthUI() {
+      const walletBar = document.getElementById('userWalletBar');
+      const guestBtns = document.getElementById('guestAuthButtons');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (currentUser) {
+        walletBar.classList.remove('hidden');
+        walletBar.classList.add('flex');
+        guestBtns.classList.add('hidden');
+        logoutBtn.classList.remove('hidden');
+        document.getElementById('currentUserEmail').textContent = currentUser.email;
+        document.getElementById('currentUserBalance').textContent = formatRp(currentUser.balance);
+      } else {
+        walletBar.classList.add('hidden');
+        walletBar.classList.remove('flex');
+        guestBtns.classList.remove('hidden');
+        logoutBtn.classList.add('hidden');
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // USER DASHBOARD & API KEYS
+    // -----------------------------------------------------------------------
+    async function loadUserDashboard() {
+      if (!authToken) return;
+      const res = await fetch('/api/user/me', {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (res.status === 401) {
+        await quickDemoLogin('user');
+        return loadUserDashboard();
+      }
+      const data = await res.json();
+      if (!data.ok) return;
+
+      currentUser = data.user;
+      updateNavbarAuthUI();
+
+      document.getElementById('dashBalance').textContent = formatRp(data.user.balance);
+      document.getElementById('dashActiveKeysCount').textContent = `${data.apiKeys.length} Key`;
+
+      const keysContainer = document.getElementById('userKeysContainer');
+      if (data.apiKeys.length === 0) {
+        keysContainer.innerHTML = `<div class="text-xs text-slate-400 py-4">Belum ada API Key. Silakan buat API Key di atas.</div>`;
+      } else {
+        keysContainer.innerHTML = data.apiKeys.map(k => {
+          const isUnli = k.tokenQuota === -1;
+          const quotaText = isUnli ? 'Unlimited Token' : `${formatNum(k.usedTokens)} / ${formatNum(k.tokenQuota)} Token`;
+          const expDate = k.expiresAt ? new Date(k.expiresAt).toLocaleDateString('id-ID') : 'Selamanya';
+          return `
+            <div class="p-4 rounded-xl bg-slate-950/90 border border-white/10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-white">${k.name}</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[11px] font-bold">${k.packageName}</span>
+                  <span class="px-2 py-0.5 rounded bg-white/5 text-slate-300 font-mono text-[11px]">Last IDE: ${k.lastClient || '-'}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <code class="px-3 py-1.5 rounded-lg bg-slate-900 border border-emerald-500/30 font-mono text-xs text-emerald-300 select-all">${k.key}</code>
+                  <button onclick="copyTextValue('${k.key}', 'API Key disalin!')" class="px-2.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs">
+                    Salin Key
+                  </button>
+                </div>
+                <div class="text-[11px] font-mono text-slate-400">
+                  Pemakaian: <strong class="text-white">${quotaText}</strong> • Limit: <strong class="text-cyan-300">${k.rpmLimit} RPM / Concurrency ${k.concurrencyLimit}</strong> • Aktif s/d: ${expDate}
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="rotateUserKey('${k.id}')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-amber-300 border border-white/10">
+                  🔄 Rotate Key
+                </button>
+                <button onclick="deleteUserKey('${k.id}')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-950 text-xs text-rose-300 border border-white/10">
+                  🗑️ Hapus
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const invBody = document.getElementById('userInvoicesTableBody');
+      invBody.innerHTML = (data.invoices || []).map(inv => `
+        <tr class="hover:bg-white/[0.02]">
+          <td class="py-2.5 px-3 font-bold text-slate-200">${inv.id}</td>
+          <td class="py-2.5 px-3 text-slate-300">${inv.packageName}</td>
+          <td class="py-2.5 px-3 text-emerald-400 font-bold">${formatRp(inv.amountUnique)}</td>
+          <td class="py-2.5 px-3">${inv.paymentMethod} (${inv.bankAccount || 'QRIS'})</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${inv.status === 'PAID' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${inv.status}</span>
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            ${inv.status === 'PENDING' ? `<button onclick='inspectInvoiceModal(${JSON.stringify(inv)})' class="px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-bold">Bayar / Verifikasi</button>` : `<span class="text-slate-500">Selesai</span>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function createNewUserKey() {
+      const name = document.getElementById('newKeyName').value || 'Project Key';
+      const packageId = document.getElementById('newKeyPackageSelect').value;
+
+      const res = await fetch('/api/user/keys', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ name, packageId })
+      });
+      const data = await res.json();
+      if (res.status === 402 && data.needsTopup) {
+        showToast(data.error, 'error');
+        openTopupModal(packageId);
+        return;
+      }
+      if (!data.ok) {
+        showToast(data.error || 'Gagal membuat key', 'error');
+        return;
+      }
+      showToast(data.message);
+      loadUserDashboard();
+    }
+
+    async function rotateUserKey(id) {
+      const res = await fetch(`/api/user/keys/${id}/rotate`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('API Key berhasil di-rotate ke kode baru!');
+        loadUserDashboard();
+      }
+    }
+
+    async function deleteUserKey(id) {
+      const res = await fetch(`/api/user/keys/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('API Key dihapus.');
+        loadUserDashboard();
+      }
+    }
+
+    async function claimFreeStarterKey() {
+      if (!authToken) {
+        await quickDemoLogin('user');
+      }
+      switchMainView('dashboard');
+      document.getElementById('newKeyPackageSelect').value = 'free';
+      showToast('Silakan klik "+ Buat API Key Sekarang" atau pilih paket Unlimited!');
+    }
+
+    function selectPackageForPurchase(pkgId) {
+      if (pkgId === 'free') {
+        claimFreeStarterKey();
+        return;
+      }
+      openTopupModal(pkgId);
+    }
+
+    // -----------------------------------------------------------------------
+    // TOP-UP & SEABANK / DYNAMIC QRIS CHECKOUT MODAL
+    // -----------------------------------------------------------------------
+    async function openTopupModal(preselectedPkgId = 'payg') {
+      if (!authToken) {
+        await quickDemoLogin('user');
+      }
+      document.getElementById('checkoutModal').classList.remove('hidden');
+      resetCheckoutModal();
+      const sel = document.getElementById('checkoutPkgSelect');
+      if (sel && preselectedPkgId) {
+        sel.value = preselectedPkgId;
+        onCheckoutPkgChange();
+      }
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').classList.add('hidden');
+    }
+
+    function resetCheckoutModal() {
+      document.getElementById('checkoutStepCreate').classList.remove('hidden');
+      document.getElementById('checkoutStepPay').classList.add('hidden');
+    }
+
+    function onCheckoutPkgChange() {
+      const val = document.getElementById('checkoutPkgSelect').value;
+      const customWrap = document.getElementById('checkoutCustomAmountWrap');
+      if (val === 'payg') {
+        customWrap.classList.remove('hidden');
+      } else {
+        const pkg = (appConfig?.packages || []).find(p => p.id === val);
+        if (pkg) {
+          document.getElementById('checkoutAmountInput').value = pkg.price;
+        }
+        customWrap.classList.add('hidden');
+      }
+    }
+
+    function setTopupAmount(amt) {
+      document.getElementById('checkoutAmountInput').value = amt;
+    }
+
+    async function generateInvoiceNow() {
+      const packageId = document.getElementById('checkoutPkgSelect').value;
+      const amount = Number(document.getElementById('checkoutAmountInput').value) || 28000;
+
+      const res = await fetch('/api/billing/invoices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ amount, packageId, paymentMethod: 'SEABANK' })
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        showToast(data.error || 'Gagal membuat invoice', 'error');
+        return;
+      }
+      inspectInvoiceModal(data.invoice);
+    }
+
+    function inspectInvoiceModal(inv) {
+      currentInvoice = inv;
+      document.getElementById('checkoutModal').classList.remove('hidden');
+      document.getElementById('checkoutStepCreate').classList.add('hidden');
+      document.getElementById('checkoutStepPay').classList.remove('hidden');
+
+      document.getElementById('invIdBadge').textContent = `${inv.id} • ${inv.packageName}`;
+      document.getElementById('invBankName').textContent = `${inv.bankName || 'SeaBank Indonesia'} (Kode Bank: ${inv.bankCode || '535'})`;
+      document.getElementById('invBankAccount').textContent = inv.bankAccount || '901482290090';
+      document.getElementById('invBankHolder').textContent = inv.bankHolder || 'M. ASWADI';
+      document.getElementById('invAmountUniqueDisplay').textContent = formatRp(inv.amountUnique);
+      document.getElementById('invBonusBadge').textContent = inv.bonusAmount > 0
+        ? `Kode Unik: #${inv.uniqueCode} • Termasuk Welcome Bonus +${formatRp(inv.bonusAmount)}!`
+        : `Kode Unik: #${inv.uniqueCode} • Otomatis Terdeteksi Sistem`;
+
+      document.getElementById('invQrisMerchant').textContent = inv.qrisMerchantName || 'ASWADI ACADEMY';
+      renderQrisGraphic(inv.qrisDynamicPayload || '000201010212');
+      switchPayTab('seabank');
+    }
+
+    function switchPayTab(tab) {
+      document.getElementById('payTab-seabank').classList.toggle('hidden', tab !== 'seabank');
+      document.getElementById('payTab-qris').classList.toggle('hidden', tab !== 'qris');
+      document.getElementById('payTabBtn-seabank').className = tab === 'seabank'
+        ? 'py-2 rounded-lg bg-emerald-500 text-slate-950 transition'
+        : 'py-2 rounded-lg text-slate-300 hover:bg-white/5 transition';
+      document.getElementById('payTabBtn-qris').className = tab === 'qris'
+        ? 'py-2 rounded-lg bg-cyan-400 text-slate-950 transition'
+        : 'py-2 rounded-lg text-slate-300 hover:bg-white/5 transition';
+    }
+
+    function renderQrisGraphic(payload) {
+      const box = document.getElementById('qrisCanvasContainer');
+      try {
+        const qr = qrcode(0, 'M');
+        qr.addData(payload);
+        qr.make();
+        box.innerHTML = qr.createSvgTag({ cellSize: 3, margin: 1 });
+      } catch (e) {
+        box.innerHTML = `<div class="text-xs text-slate-900 font-mono p-2">QRIS Dynamic Ready</div>`;
+      }
+    }
+
+    function copyInvoiceExactAmount() {
+      if (!currentInvoice) return;
+      copyTextValue(String(currentInvoice.amountUnique), `Nominal unik Rp ${currentInvoice.amountUnique.toLocaleString('id-ID')} disalin!`);
+    }
+
+    function copyDynamicQrisPayload() {
+      if (!currentInvoice) return;
+      copyTextValue(currentInvoice.qrisDynamicPayload, 'Payload EMVCo Dynamic QRIS disalin!');
+    }
+
+    async function verifyCurrentInvoiceNow() {
+      if (!currentInvoice) return;
+      const btn = document.getElementById('verifyReceiptBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Memverifikasi Mutasi SeaBank / QRIS...';
+
+      try {
+        const res = await fetch('/api/billing/verify-receipt', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ invoiceId: currentInvoice.id, transferNote: 'Verifikasi Instan User' })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast(`🎉 ${data.message}`);
+          closeCheckoutModal();
+          switchMainView('dashboard');
+          loadUserDashboard();
+        } else {
+          showToast(data.error || 'Gagal verifikasi', 'error');
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✅ Saya Sudah Transfer — Verifikasi & Aktifkan Sekarang';
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // ADMIN PANEL FUNCTIONS
+    // -----------------------------------------------------------------------
+    async function loadAdminOverview() {
+      const res = await fetch('/api/admin/overview', {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (res.status === 401 || res.status === 403) {
+        await quickDemoLogin('admin');
+        return loadAdminOverview();
+      }
+      const data = await res.json();
+      if (!data.ok) return;
+
+      // Populate SeaBank & QRIS settings
+      document.getElementById('admSeabankName').value = data.paymentConfig.seabank.bankName;
+      document.getElementById('admSeabankNumber').value = data.paymentConfig.seabank.accountNumber;
+      document.getElementById('admSeabankHolder').value = data.paymentConfig.seabank.accountHolder;
+      document.getElementById('admSeabankAutoVerify').checked = !!data.paymentConfig.seabank.autoApproveOnReceiptVerify;
+
+      document.getElementById('admQrisMerchant').value = data.paymentConfig.gopayQris.merchantName;
+      document.getElementById('admQrisNmid').value = data.paymentConfig.gopayQris.nmid;
+      document.getElementById('admQrisPayload').value = data.paymentConfig.gopayQris.staticQrisPayload;
+
+      // Brand
+      document.getElementById('admBrandName').value = data.brand.name;
+      document.getElementById('admBrandTagline').value = data.brand.tagline;
+
+      // Admin Invoices
+      const invTbody = document.getElementById('adminInvoicesTableBody');
+      invTbody.innerHTML = (data.invoices || []).map(inv => `
+        <tr class="hover:bg-white/[0.02]">
+          <td class="py-2.5 px-3 font-bold text-white">${inv.id}</td>
+          <td class="py-2.5 px-3 text-slate-300">${inv.userEmail}</td>
+          <td class="py-2.5 px-3 text-emerald-300">${inv.packageName}</td>
+          <td class="py-2.5 px-3 font-bold text-amber-300">${formatRp(inv.amountUnique)}</td>
+          <td class="py-2.5 px-3">${inv.paymentMethod}</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${inv.status === 'PAID' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${inv.status}</span>
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            ${inv.status === 'PENDING'
+              ? `<button onclick="approveInvoiceAdmin('${inv.id}')" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold">✓ Approve Lunas</button>`
+              : `<span class="text-slate-500">Terverifikasi</span>`
+            }
+          </td>
+        </tr>
+      `).join('');
+
+      // Upstreams
+      const upList = document.getElementById('adminUpstreamsList');
+      upList.innerHTML = (data.upstreams || []).map(u => `
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-white/10 flex items-center justify-between gap-3 text-xs">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-white">${u.name}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono ${u.enabled ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'}">${u.enabled ? 'ACTIVE' : 'STANDBY'}</span>
+            </div>
+            <div class="font-mono text-slate-400 mt-0.5">${u.baseUrl} • Requests: ${u.totalRequests || 0} • Avg: ${u.avgLatencyMs || 0} ms</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleAdminUpstream('${u.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono">
+              ${u.enabled ? 'Disable' : 'Enable'}
+            </button>
+            <button onclick="deleteAdminUpstream('${u.id}')" class="px-2 py-1 rounded bg-rose-950/60 text-rose-300">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function approveInvoiceAdmin(id) {
+      const res = await fetch(`/api/admin/invoices/${id}/approve`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast(`Invoice ${id} berhasil di-approve LUNAS!`);
+        loadAdminOverview();
+      }
+    }
+
+    async function saveAdminPaymentConfig() {
+      const payload = {
+        seabank: {
+          bankName: document.getElementById('admSeabankName').value,
+          accountNumber: document.getElementById('admSeabankNumber').value,
+          accountHolder: document.getElementById('admSeabankHolder').value,
+          autoApproveOnReceiptVerify: document.getElementById('admSeabankAutoVerify').checked
+        },
+        gopayQris: {
+          merchantName: document.getElementById('admQrisMerchant').value,
+          nmid: document.getElementById('admQrisNmid').value,
+          staticQrisPayload: document.getElementById('admQrisPayload').value
+        }
+      };
+      const res = await fetch('/api/admin/payment-config', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('Konfigurasi SeaBank & GoPay Merchant QRIS berhasil disimpan!');
+        loadPublicConfig();
+      }
+    }
+
+    async function addAdminUpstream() {
+      const name = document.getElementById('newUpName').value;
+      const baseUrl = document.getElementById('newUpUrl').value;
+      const apiKey = document.getElementById('newUpKey').value;
+      const res = await fetch('/api/admin/upstreams', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ name, baseUrl, apiKey })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('Upstream baru berhasil ditambahkan!');
+        loadAdminOverview();
+      } else {
+        showToast(data.error || 'Gagal menambah upstream', 'error');
+      }
+    }
+
+    async function toggleAdminUpstream(id) {
+      await fetch(`/api/admin/upstreams/${id}/toggle`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      loadAdminOverview();
+    }
+
+    async function deleteAdminUpstream(id) {
+      await fetch(`/api/admin/upstreams/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      loadAdminOverview();
+    }
+
+    async function rotateAdminBansos() {
+      const res = await fetch('/api/admin/bansos/rotate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ resetQuota: true, totalQuota: 2000000000 })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('API Key Bansos berhasil di-rotate & kuota di-reset ke 2.000.000.000 token!');
+        loadPublicConfig();
+      }
+    }
+
+    async function saveAdminBrand() {
+      const name = document.getElementById('admBrandName').value;
+      const tagline = document.getElementById('admBrandTagline').value;
+      const res = await fetch('/api/admin/brand', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ name, tagline })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('Identitas Brand berhasil diperbarui!');
+        loadPublicConfig();
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadPublicConfig();
+      if (authToken) {
+        const res = await fetch('/api/user/me', { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            currentUser = data.user;
+            updateNavbarAuthUI();
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
