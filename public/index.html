@@ -841,6 +841,23 @@
   <!-- FRONTEND APPLICATION LOGIC -->
   <!-- ===================================================================== -->
   <script>
+    const LIVE_BACKEND_URL = 'https://organize-usgs-reliability-greensboro.trycloudflare.com';
+    const IS_STATIC_PAGES = window.location.hostname.endsWith('github.io') || window.location.hostname === 'ai.aswadi.my.id';
+    const _origFetch = window.fetch.bind(window);
+    window.fetch = async function(input, init) {
+      if (typeof input === 'string' && (input.startsWith('/api/') || input.startsWith('/v1/'))) {
+        if (IS_STATIC_PAGES) {
+          return _origFetch(LIVE_BACKEND_URL + input, init);
+        }
+        try {
+          const res = await _origFetch(input, init);
+          if (res.status !== 404) return res;
+        } catch (_) {}
+        return _origFetch(LIVE_BACKEND_URL + input, init);
+      }
+      return _origFetch(input, init);
+    };
+
     let appConfig = null;
     let authToken = localStorage.getItem('satukey_token') || '';
     let currentUser = null;
