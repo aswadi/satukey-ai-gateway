@@ -118,11 +118,11 @@
         </div>
 
         <div id="guestAuthButtons" class="flex items-center gap-2">
-          <button onclick="quickDemoLogin('user')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-300 border border-emerald-500/20 transition">
-            ⚡ Akun Demo
+          <button onclick="openAuthModal('register')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-300 border border-emerald-500/20 transition">
+            🚀 Daftar Gratis
           </button>
-          <button onclick="openAuthModal()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-emerald-500/20">
-            Masuk / Daftar
+          <button onclick="openAuthModal('login')" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-emerald-500/20">
+            Masuk / Login
           </button>
         </div>
 
@@ -797,22 +797,16 @@
         </div>
         <div>
           <label class="text-slate-400 block mb-1">Email:</label>
-          <input id="authEmailInput" type="email" value="demo@aswadi.my.id" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
+          <input id="authEmailInput" type="email" placeholder="nama@email.com" value="" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
         </div>
         <div>
           <label class="text-slate-400 block mb-1">Password:</label>
-          <input id="authPassInput" type="password" value="demo123" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
+          <input id="authPassInput" type="password" placeholder="Masukkan password..." value="" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
         </div>
 
         <button onclick="submitAuthForm()" id="authSubmitBtn" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition">
           Masuk ke Dashboard →
         </button>
-
-        <div class="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
-          <button onclick="quickDemoLogin('user'); closeAuthModal();" class="w-full py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-semibold">
-            ⚡ 1-Klik Akun Demo User
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -904,7 +898,9 @@
 
       if (view === 'dashboard') {
         if (!authToken) {
-          quickDemoLogin('user').then(() => loadUserDashboard());
+          switchMainView('home');
+          openAuthModal('login');
+          showToast('Silakan masuk atau daftar terlebih dahulu untuk membuka Dashboard.');
         } else {
           loadUserDashboard();
         }
@@ -1219,8 +1215,9 @@ console.log(res.choices[0].message.content);`,
     // -----------------------------------------------------------------------
     // AUTHENTICATION & DEMO LOGINS
     // -----------------------------------------------------------------------
-    function openAuthModal() {
+    function openAuthModal(defaultMode = 'login') {
       document.getElementById('authModal').classList.remove('hidden');
+      switchAuthMode(defaultMode);
     }
     function closeAuthModal() {
       document.getElementById('authModal').classList.add('hidden');
@@ -1330,8 +1327,9 @@ console.log(res.choices[0].message.content);`,
         headers: { 'Authorization': `Bearer ${authToken}` }
       });
       if (res.status === 401) {
-        await quickDemoLogin('user');
-        return loadUserDashboard();
+        logoutUser();
+        openAuthModal('login');
+        return;
       }
       const data = await res.json();
       if (!data.ok) return;
@@ -1382,7 +1380,10 @@ console.log(res.choices[0].message.content);`,
       }
 
       const invBody = document.getElementById('userInvoicesTableBody');
-      invBody.innerHTML = (data.invoices || []).map(inv => `
+      if (!data.invoices || data.invoices.length === 0) {
+        invBody.innerHTML = `<tr><td colspan="6" class="py-5 px-3 text-center text-slate-400">Belum ada riwayat invoice. Klik "+ Top-Up Saldo (SeaBank / QRIS)" untuk membuat pembayaran baru.</td></tr>`;
+      } else {
+        invBody.innerHTML = (data.invoices || []).map(inv => `
         <tr class="hover:bg-white/[0.02]">
           <td class="py-2.5 px-3 font-bold text-slate-200">${inv.id}</td>
           <td class="py-2.5 px-3 text-slate-300">${inv.packageName}</td>
@@ -1396,6 +1397,7 @@ console.log(res.choices[0].message.content);`,
           </td>
         </tr>
       `).join('');
+      }
     }
 
     async function createNewUserKey() {
@@ -1450,7 +1452,9 @@ console.log(res.choices[0].message.content);`,
 
     async function claimFreeStarterKey() {
       if (!authToken) {
-        await quickDemoLogin('user');
+        openAuthModal('register');
+        showToast('Daftar akun gratis untuk langsung mendapatkan Free Starter Key!');
+        return;
       }
       switchMainView('dashboard');
       document.getElementById('newKeyPackageSelect').value = 'free';
@@ -1470,7 +1474,9 @@ console.log(res.choices[0].message.content);`,
     // -----------------------------------------------------------------------
     async function openTopupModal(preselectedPkgId = 'payg') {
       if (!authToken) {
-        await quickDemoLogin('user');
+        openAuthModal('register');
+        showToast('Silakan Daftar atau Masuk terlebih dahulu sebelum membuat Invoice pembayaran.');
+        return;
       }
       document.getElementById('checkoutModal').classList.remove('hidden');
       resetCheckoutModal();
@@ -1799,6 +1805,10 @@ console.log(res.choices[0].message.content);`,
     window.addEventListener('DOMContentLoaded', async () => {
       await loadPublicConfig();
       if (authToken) {
+        if (authToken.includes('usr-demo')) {
+          logoutUser();
+          return;
+        }
         const res = await fetch('/api/user/me', { headers: { 'Authorization': `Bearer ${authToken}` } });
         if (res.ok) {
           const data = await res.json();
@@ -1806,6 +1816,8 @@ console.log(res.choices[0].message.content);`,
             currentUser = data.user;
             updateNavbarAuthUI();
           }
+        } else {
+          logoutUser();
         }
       }
     });

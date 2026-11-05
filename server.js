@@ -965,20 +965,9 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 app.post('/api/auth/demo', (req, res) => {
-  const { role = 'user' } = req.body || {};
-  if (role === 'admin') {
-    return res.status(403).json({
-      ok: false,
-      error: 'Login Cepat Admin dinonaktifkan demi keamanan produksi. Silakan login menggunakan email & password Administrator.'
-    });
-  }
-  const db = loadDb();
-  const user = db.users.find(u => u.email === 'demo@aswadi.my.id') || db.users.find(u => u.role === 'user');
-  const token = createSessionToken(user);
-  res.json({
-    ok: true,
-    token,
-    user: { id: user.id, name: user.name, email: user.email, role: user.role, balance: user.balance }
+  return res.status(403).json({
+    ok: false,
+    error: 'Akun Demo sudah dinonaktifkan. Silakan Daftar (Gratis) atau Masuk dengan akun asli Anda.'
   });
 });
 
