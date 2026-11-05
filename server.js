@@ -26,19 +26,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // DATABASE HELPER (JSON Persistent Store with Serverless /tmp Fallback)
 // ============================================================================
 let dbCache = null;
-let dbMtimeMs = 0;
 
 function loadDb() {
-  const targetPath = fs.existsSync(DB_PATH) ? DB_PATH : TMP_DB_PATH;
-  try {
-    const stat = fs.statSync(targetPath);
-    if (!dbCache || stat.mtimeMs !== dbMtimeMs) {
-      const raw = fs.readFileSync(targetPath, 'utf8').replace(/^\uFEFF/, '');
-      dbCache = JSON.parse(raw);
-      dbMtimeMs = stat.mtimeMs;
-    }
-  } catch (e) {
-    if (!dbCache) throw e;
+  if (!dbCache) {
+    const targetPath = fs.existsSync(TMP_DB_PATH) ? TMP_DB_PATH : DB_PATH;
+    const raw = fs.readFileSync(targetPath, 'utf8').replace(/^\uFEFF/, '');
+    dbCache = JSON.parse(raw);
   }
   return dbCache;
 }
@@ -48,7 +41,6 @@ function saveDb() {
   const serialized = JSON.stringify(dbCache, null, 2);
   try {
     fs.writeFileSync(DB_PATH, serialized, 'utf8');
-    dbMtimeMs = fs.statSync(DB_PATH).mtimeMs;
   } catch (err) {
     try {
       fs.writeFileSync(TMP_DB_PATH, serialized, 'utf8');
@@ -764,6 +756,13 @@ app.get(['/api/public/config', '/api/config/public'], (req, res) => {
         accountHolder: db.paymentConfig.seabank.accountHolder,
         expiryMinutes: db.paymentConfig.seabank.expiryMinutes
       },
+      bca: db.paymentConfig.bca || {
+        enabled: true,
+        bankName: "Bank Central Asia (BCA)",
+        bankCode: "014",
+        accountNumber: "0214224531",
+        accountHolder: "M. ASWADI"
+      },
       gopayQris: {
         enabled: db.paymentConfig.gopayQris.enabled,
         merchantName: db.paymentConfig.gopayQris.merchantName,
@@ -1298,7 +1297,7 @@ app.post('/api/billing/verify-receipt', requireAuth, (req, res) => {
     ok: true,
     pendingVerification: true,
     invoice: inv,
-    message: `Konfirmasi transfer Rp ${inv.amountUnique.toLocaleString('id-ID')} berhasil dikirim! Sistem sedang memverifikasi mutasi SeaBank / QRIS Anda (1–3 menit). Paket & saldo akan aktif otomatis begitu mutasi terkonfirmasi.`
+    message: `Konfirmasi transfer Rp ${inv.amountUnique.toLocaleString('id-ID')} berhasil dikirim! Sistem sedang memverifikasi mutasi SeaBank / BCA / QRIS Anda (1–3 menit). Paket & saldo akan aktif otomatis begitu mutasi terkonfirmasi.`
   });
 });
 

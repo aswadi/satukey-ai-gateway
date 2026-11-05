@@ -109,8 +109,8 @@
       <div class="flex items-center gap-2.5">
         <div id="userWalletBar" class="hidden items-center gap-2 bg-slate-900/90 border border-emerald-500/30 rounded-xl px-3 py-1.5">
           <div class="text-right">
-            <div class="text-[10px] text-slate-400 leading-none" id="currentUserEmail">demo@aswadi.my.id</div>
-            <div class="text-xs font-mono font-bold text-emerald-400 mt-0.5" id="currentUserBalance">Rp 75.000</div>
+            <div class="text-[10px] text-slate-400 leading-none" id="currentUserEmail">-</div>
+            <div class="text-xs font-mono font-bold text-emerald-400 mt-0.5" id="currentUserBalance">Rp 0</div>
           </div>
           <button onclick="openTopupModal()" class="ml-1 px-2.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow">
             + Top Up
@@ -163,18 +163,18 @@
         </h1>
 
         <p id="heroTagline" class="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
-          One Key, All Models — Akses <strong>Claude Sonnet 4.5</strong>, <strong>GPT-5 Codex</strong>, <strong>Gemini 2.5 Pro</strong>, <strong>DeepSeek V4.1</strong>, hingga <strong>Qwen 3 Coder</strong> tanpa kartu kredit internasional. Pembayaran instan via <strong>SeaBank</strong> & <strong>QRIS Rupiah</strong>, kontrol kuota & RPM per-key.
+          One Key, All Models — Akses <strong>Claude Sonnet 4.5</strong>, <strong>GPT-5 Codex</strong>, <strong>Gemini 2.5 Pro</strong>, <strong>DeepSeek V4.1</strong>, hingga <strong>Qwen 3 Coder</strong> tanpa kartu kredit internasional. Pembayaran instan via <strong>QRIS GoPay</strong>, <strong>BCA</strong> & <strong>SeaBank</strong>, kontrol kuota & RPM per-key.
         </p>
 
         <div class="flex flex-wrap items-center gap-3 pt-1">
           <button onclick="claimFreeStarterKey()" class="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/20 transition flex items-center gap-2">
-            <span>🚀 Klaim Free 3.000.000 Token</span>
+            <span>🚀 Klaim Free Starter (+30.000 Token)</span>
           </button>
           <a href="#pricing" class="px-5 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-sm border border-white/10 transition">
-            Lihat Paket Unlimited (Mulai Rp 25rb)
+            Lihat Paket Coding (Mulai Rp 10rb)
           </a>
           <button onclick="openTopupModal()" class="px-4 py-3.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 font-semibold text-sm border border-blue-500/30 transition">
-            💳 Top-Up SeaBank / QRIS
+            💳 Top-Up QRIS / BCA / SeaBank
           </button>
         </div>
 
@@ -690,9 +690,10 @@
         </div>
 
         <!-- Payment Method Switcher -->
-        <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1.5 rounded-xl border border-white/10 text-xs font-bold">
-          <button onclick="switchPayTab('seabank')" id="payTabBtn-seabank" class="py-2 rounded-lg bg-emerald-500 text-slate-950 transition">🏦 Transfer SeaBank</button>
-          <button onclick="switchPayTab('qris')" id="payTabBtn-qris" class="py-2 rounded-lg text-slate-300 hover:bg-white/5 transition">📱 QRIS Dinamis (GoPay)</button>
+        <div class="grid grid-cols-3 gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-white/10 text-xs font-bold">
+          <button onclick="switchPayTab('seabank')" id="payTabBtn-seabank" class="py-2 rounded-lg bg-emerald-500 text-slate-950 transition">🏦 SeaBank</button>
+          <button onclick="switchPayTab('bca')" id="payTabBtn-bca" class="py-2 rounded-lg text-slate-300 hover:bg-white/5 transition">🏦 Bank BCA</button>
+          <button onclick="switchPayTab('qris')" id="payTabBtn-qris" class="py-2 rounded-lg text-slate-300 hover:bg-white/5 transition">📱 QRIS GoPay</button>
         </div>
 
         <!-- TAB A: SEABANK TRANSFER DETAILS -->
@@ -717,7 +718,29 @@
           </div>
         </div>
 
-        <!-- TAB B: DYNAMIC QRIS (EMVCo CRC16) + OFFICIAL GOPAY MERCHANT POSTER -->
+        <!-- TAB B: BANK BCA TRANSFER DETAILS -->
+        <div id="payTab-bca" class="hidden bg-slate-950/90 rounded-xl p-4 border border-blue-500/30 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <div>
+              <div class="text-[11px] text-slate-400">Bank Tujuan (Transfer Antar Bank / m-BCA)</div>
+              <div class="text-sm font-bold text-white">Bank Central Asia — BCA (Kode Bank: 014)</div>
+            </div>
+            <span class="px-2 py-1 rounded bg-blue-500/20 text-blue-300 font-mono text-xs font-bold">BCA</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-slate-400">Nomor Rekening BCA</div>
+              <div id="invBcaAccount" class="text-xl font-mono font-extrabold text-blue-400 tracking-wider select-all">0214224531</div>
+              <div class="text-xs text-slate-300 mt-0.5">A/N: <strong class="text-white">M. ASWADI</strong></div>
+            </div>
+            <button onclick="copyTextValue('0214224531', 'Nomor Rekening BCA 0214224531 a.n. M. ASWADI disalin!')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-blue-500 hover:text-slate-950 text-xs font-mono font-semibold border border-white/10 transition">
+              Salin Rek BCA
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB C: DYNAMIC QRIS (EMVCo CRC16) + OFFICIAL GOPAY MERCHANT POSTER -->
         <div id="payTab-qris" class="hidden bg-slate-950/90 rounded-xl p-4 border border-cyan-500/30 text-center space-y-3">
           <div class="flex items-center justify-between gap-2">
             <span class="text-xs font-bold text-cyan-300">QRIS GoPay Merchant: ASWADI ACADEMY</span>
@@ -787,7 +810,7 @@
 
       <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-xl border border-white/10 text-xs font-bold">
         <button onclick="switchAuthMode('login')" id="authTab-login" class="py-2 rounded-lg bg-emerald-500 text-slate-950">Masuk (Login)</button>
-        <button onclick="switchAuthMode('register')" id="authTab-register" class="py-2 rounded-lg text-slate-300">Daftar Gratis (+3 Juta Token)</button>
+        <button onclick="switchAuthMode('register')" id="authTab-register" class="py-2 rounded-lg text-slate-300">Daftar Gratis (+30.000 Token)</button>
       </div>
 
       <div class="space-y-3 text-xs">
@@ -797,11 +820,11 @@
         </div>
         <div>
           <label class="text-slate-400 block mb-1">Email:</label>
-          <input id="authEmailInput" type="email" placeholder="nama@email.com" value="" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
+          <input id="authEmailInput" type="email" placeholder="nama@email.com" value="" autocomplete="email" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
         </div>
         <div>
           <label class="text-slate-400 block mb-1">Password:</label>
-          <input id="authPassInput" type="password" placeholder="Masukkan password..." value="" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
+          <input id="authPassInput" type="password" placeholder="Masukkan password..." value="" autocomplete="current-password" class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono" />
         </div>
 
         <button onclick="submitAuthForm()" id="authSubmitBtn" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition">
@@ -817,8 +840,10 @@
       <div>
         <span class="font-bold text-white">SATUKEY by Aswadi AI</span> (`ai.aswadi.my.id`) — Unified OpenAI & Anthropic API Gateway Indonesia.
       </div>
-      <div class="flex items-center gap-4 font-mono">
-        <span>SeaBank: 901482290090 (M. ASWADI)</span>
+      <div class="flex flex-wrap items-center gap-3 font-mono">
+        <span>SeaBank: 901482290090</span>
+        <span>•</span>
+        <span>BCA: 0214224531 (M. ASWADI)</span>
         <span>•</span>
         <a href="/v1/models" target="_blank" class="text-emerald-400 hover:underline">/v1/models</a>
       </div>
@@ -1227,7 +1252,13 @@ console.log(res.choices[0].message.content);`,
       document.getElementById('authNameWrap').classList.toggle('hidden', mode !== 'register');
       document.getElementById('authTab-login').className = mode === 'login' ? 'py-2 rounded-lg bg-emerald-500 text-slate-950' : 'py-2 rounded-lg text-slate-300';
       document.getElementById('authTab-register').className = mode === 'register' ? 'py-2 rounded-lg bg-emerald-500 text-slate-950' : 'py-2 rounded-lg text-slate-300';
-      document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Masuk ke Dashboard →' : 'Daftar & Klaim Free 3 Juta Token →';
+      document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Masuk ke Dashboard →' : 'Daftar Gratis (+30.000 Token) →';
+      const emailEl = document.getElementById('authEmailInput');
+      const passEl = document.getElementById('authPassInput');
+      if (emailEl && emailEl.value === 'demo@aswadi.my.id') {
+        emailEl.value = '';
+        if (passEl) passEl.value = '';
+      }
     }
 
     async function submitAuthForm() {
@@ -1556,10 +1587,18 @@ console.log(res.choices[0].message.content);`,
 
     function switchPayTab(tab) {
       document.getElementById('payTab-seabank').classList.toggle('hidden', tab !== 'seabank');
+      const bcaTab = document.getElementById('payTab-bca');
+      if (bcaTab) bcaTab.classList.toggle('hidden', tab !== 'bca');
       document.getElementById('payTab-qris').classList.toggle('hidden', tab !== 'qris');
       document.getElementById('payTabBtn-seabank').className = tab === 'seabank'
         ? 'py-2 rounded-lg bg-emerald-500 text-slate-950 transition'
         : 'py-2 rounded-lg text-slate-300 hover:bg-white/5 transition';
+      const bcaBtn = document.getElementById('payTabBtn-bca');
+      if (bcaBtn) {
+        bcaBtn.className = tab === 'bca'
+          ? 'py-2 rounded-lg bg-blue-400 text-slate-950 transition'
+          : 'py-2 rounded-lg text-slate-300 hover:bg-white/5 transition';
+      }
       document.getElementById('payTabBtn-qris').className = tab === 'qris'
         ? 'py-2 rounded-lg bg-cyan-400 text-slate-950 transition'
         : 'py-2 rounded-lg text-slate-300 hover:bg-white/5 transition';
