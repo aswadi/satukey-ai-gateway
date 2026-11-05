@@ -100,7 +100,7 @@
         <button onclick="switchMainView('dashboard')" id="tabBtn-dashboard" class="px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
           <span>Dashboard & API Key</span>
         </button>
-        <button onclick="switchMainView('admin')" id="tabBtn-admin" class="px-3.5 py-2 rounded-lg text-amber-300 hover:bg-amber-500/10 transition flex items-center gap-1.5">
+        <button onclick="switchMainView('admin')" id="tabBtn-admin" class="hidden px-3.5 py-2 rounded-lg text-amber-300 hover:bg-amber-500/10 transition items-center gap-1.5">
           <span>⚙️ Admin Panel</span>
         </button>
       </nav>
@@ -137,7 +137,7 @@
       <button onclick="switchMainView('home')" class="px-3 py-1.5 rounded-lg text-emerald-400 font-semibold">Beranda</button>
       <button onclick="switchMainView('dashboard')" class="px-3 py-1.5 rounded-lg text-slate-300">Dashboard Key</button>
       <button onclick="openTopupModal()" class="px-3 py-1.5 rounded-lg text-emerald-300 font-semibold">+ Top Up SeaBank</button>
-      <button onclick="switchMainView('admin')" class="px-3 py-1.5 rounded-lg text-amber-300">⚙️ Admin</button>
+      <button onclick="switchMainView('admin')" id="mobBtn-admin" class="hidden px-3 py-1.5 rounded-lg text-amber-300">⚙️ Admin</button>
     </div>
   </header>
 
@@ -503,9 +503,6 @@
         <p class="text-sm text-slate-400">Kelola Rekening SeaBank (`901482290090`), GoPay Merchant QRIS, Upstream Router (`9router`), Paket Harga, & Approval Invoice.</p>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="quickDemoLogin('admin')" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
-          🔑 Login Cepat Admin (admin@aswadi.my.id)
-        </button>
         <button onclick="loadAdminOverview()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-white/10">
           ↻ Refresh Admin Data
         </button>
@@ -734,8 +731,8 @@
             </div>
             <div class="bg-slate-900/90 p-3 rounded-xl border border-white/10 space-y-1.5">
               <div class="text-[11px] font-semibold text-cyan-300">🏪 Poster QRIS Resmi GoPay Merchant</div>
-              <a href="/qris_aswadi_academy.jpg" target="_blank" title="Klik untuk memperbesar QRIS ASWADI ACADEMY">
-                <img src="/qris_aswadi_academy.jpg" alt="QRIS ASWADI ACADEMY" class="mx-auto h-44 object-contain rounded-xl border border-cyan-500/30 shadow-lg hover:scale-105 transition" />
+              <a href="qris_aswadi_academy.jpg" target="_blank" title="Klik untuk memperbesar QRIS ASWADI ACADEMY">
+                <img src="qris_aswadi_academy.jpg" alt="QRIS ASWADI ACADEMY" class="mx-auto h-44 object-contain rounded-xl border border-cyan-500/30 shadow-lg hover:scale-105 transition" />
               </a>
               <div class="text-[10px] text-slate-400">Aswadi Academy • A01 (Klik perbesar)</div>
             </div>
@@ -747,7 +744,7 @@
             <button onclick="copyDynamicQrisPayload()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-mono text-cyan-300 border border-white/10">
               Salin String EMVCo Dynamic QRIS
             </button>
-            <a href="/qris_aswadi_academy.jpg" download="QRIS_ASWADI_ACADEMY.jpg" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-[11px] font-semibold text-cyan-300 border border-cyan-500/30">
+            <a href="qris_aswadi_academy.jpg" download="QRIS_ASWADI_ACADEMY.jpg" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-[11px] font-semibold text-cyan-300 border border-cyan-500/30">
               ⬇ Unduh Gambar QRIS Resmi
             </a>
           </div>
@@ -812,11 +809,8 @@
         </button>
 
         <div class="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
-          <button onclick="quickDemoLogin('user'); closeAuthModal();" class="flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-semibold">
-            ⚡ 1-Klik Demo User
-          </button>
-          <button onclick="quickDemoLogin('admin'); closeAuthModal();" class="flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold">
-            🔑 1-Klik Admin
+          <button onclick="quickDemoLogin('user'); closeAuthModal();" class="w-full py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-semibold">
+            ⚡ 1-Klik Akun Demo User
           </button>
         </div>
       </div>
@@ -841,8 +835,8 @@
   <!-- FRONTEND APPLICATION LOGIC -->
   <!-- ===================================================================== -->
   <script>
-    const LIVE_BACKEND_URL = 'https://organize-usgs-reliability-greensboro.trycloudflare.com';
-    const IS_STATIC_PAGES = window.location.hostname.endsWith('github.io') || window.location.hostname === 'ai.aswadi.my.id';
+    const LIVE_BACKEND_URL = 'https://ai.aswadi.my.id';
+    const IS_STATIC_PAGES = window.location.hostname.endsWith('github.io');
     const _origFetch = window.fetch.bind(window);
     window.fetch = async function(input, init) {
       if (typeof input === 'string' && (input.startsWith('/api/') || input.startsWith('/v1/'))) {
@@ -916,7 +910,9 @@
         }
       } else if (view === 'admin') {
         if (!currentUser || currentUser.role !== 'admin') {
-          quickDemoLogin('admin').then(() => loadAdminOverview());
+          showToast('Silakan login menggunakan akun Administrator.', 'error');
+          switchMainView('home');
+          openAuthModal();
         } else {
           loadAdminOverview();
         }
@@ -1292,6 +1288,8 @@ console.log(res.choices[0].message.content);`,
       const walletBar = document.getElementById('userWalletBar');
       const guestBtns = document.getElementById('guestAuthButtons');
       const logoutBtn = document.getElementById('logoutBtn');
+      const adminTabBtn = document.getElementById('tabBtn-admin');
+      const mobAdminBtn = document.getElementById('mobBtn-admin');
 
       if (currentUser) {
         walletBar.classList.remove('hidden');
@@ -1300,11 +1298,26 @@ console.log(res.choices[0].message.content);`,
         logoutBtn.classList.remove('hidden');
         document.getElementById('currentUserEmail').textContent = currentUser.email;
         document.getElementById('currentUserBalance').textContent = formatRp(currentUser.balance);
+        const isAdmin = currentUser.role === 'admin';
+        if (adminTabBtn) {
+          adminTabBtn.classList.toggle('hidden', !isAdmin);
+          adminTabBtn.classList.toggle('flex', isAdmin);
+        }
+        if (mobAdminBtn) {
+          mobAdminBtn.classList.toggle('hidden', !isAdmin);
+        }
       } else {
         walletBar.classList.add('hidden');
         walletBar.classList.remove('flex');
         guestBtns.classList.remove('hidden');
         logoutBtn.classList.add('hidden');
+        if (adminTabBtn) {
+          adminTabBtn.classList.add('hidden');
+          adminTabBtn.classList.remove('flex');
+        }
+        if (mobAdminBtn) {
+          mobAdminBtn.classList.add('hidden');
+        }
       }
     }
 
@@ -1376,10 +1389,10 @@ console.log(res.choices[0].message.content);`,
           <td class="py-2.5 px-3 text-emerald-400 font-bold">${formatRp(inv.amountUnique)}</td>
           <td class="py-2.5 px-3">${inv.paymentMethod} (${inv.bankAccount || 'QRIS'})</td>
           <td class="py-2.5 px-3">
-            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${inv.status === 'PAID' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${inv.status}</span>
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${inv.status === 'PAID' ? 'bg-emerald-500/20 text-emerald-300' : inv.status === 'VERIFYING' ? 'bg-cyan-500/20 text-cyan-300' : 'bg-amber-500/20 text-amber-300'}">${inv.status === 'VERIFYING' ? 'MENUNGGU VERIFIKASI' : inv.status}</span>
           </td>
           <td class="py-2.5 px-3 text-right">
-            ${inv.status === 'PENDING' ? `<button onclick='inspectInvoiceModal(${JSON.stringify(inv)})' class="px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-bold">Bayar / Verifikasi</button>` : `<span class="text-slate-500">Selesai</span>`}
+            ${inv.status === 'PENDING' ? `<button onclick='inspectInvoiceModal(${JSON.stringify(inv)})' class="px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-bold">Bayar / Verifikasi</button>` : inv.status === 'VERIFYING' ? `<span class="text-cyan-400">⏳ Dicek Sistem</span>` : `<span class="text-slate-500">Selesai</span>`}
           </td>
         </tr>
       `).join('');
@@ -1606,8 +1619,10 @@ console.log(res.choices[0].message.content);`,
         headers: { 'Authorization': `Bearer ${authToken}` }
       });
       if (res.status === 401 || res.status === 403) {
-        await quickDemoLogin('admin');
-        return loadAdminOverview();
+        showToast('Akses khusus Administrator. Silakan login sebagai Admin.', 'error');
+        switchMainView('home');
+        openAuthModal();
+        return;
       }
       const data = await res.json();
       if (!data.ok) return;
@@ -1636,10 +1651,10 @@ console.log(res.choices[0].message.content);`,
           <td class="py-2.5 px-3 font-bold text-amber-300">${formatRp(inv.amountUnique)}</td>
           <td class="py-2.5 px-3">${inv.paymentMethod}</td>
           <td class="py-2.5 px-3">
-            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${inv.status === 'PAID' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${inv.status}</span>
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${inv.status === 'PAID' ? 'bg-emerald-500/20 text-emerald-300' : inv.status === 'VERIFYING' ? 'bg-cyan-500/20 text-cyan-300 animate-pulse' : 'bg-amber-500/20 text-amber-300'}">${inv.status === 'VERIFYING' ? '⚡ BUTUH VERIFIKASI' : inv.status}</span>
           </td>
           <td class="py-2.5 px-3 text-right">
-            ${inv.status === 'PENDING'
+            ${inv.status !== 'PAID'
               ? `<button onclick="approveInvoiceAdmin('${inv.id}')" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold">✓ Approve Lunas</button>`
               : `<span class="text-slate-500">Terverifikasi</span>`
             }

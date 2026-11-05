@@ -12,18 +12,33 @@ const TMP_DB_PATH = path.join(os.tmpdir(), 'satukey_db.json');
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+app.use((req, res, next) => {
+  if (req.url === '/satukey') {
+    req.url = '/';
+  } else if (req.url.startsWith('/satukey/')) {
+    req.url = req.url.slice('/satukey'.length) || '/';
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ============================================================================
 // DATABASE HELPER (JSON Persistent Store with Serverless /tmp Fallback)
 // ============================================================================
 let dbCache = null;
+let dbMtimeMs = 0;
 
 function loadDb() {
-  if (!dbCache) {
-    const targetPath = fs.existsSync(TMP_DB_PATH) ? TMP_DB_PATH : DB_PATH;
-    const raw = fs.readFileSync(targetPath, 'utf8');
-    dbCache = JSON.parse(raw);
+  const targetPath = fs.existsSync(DB_PATH) ? DB_PATH : TMP_DB_PATH;
+  try {
+    const stat = fs.statSync(targetPath);
+    if (!dbCache || stat.mtimeMs !== dbMtimeMs) {
+      const raw = fs.readFileSync(targetPath, 'utf8').replace(/^\uFEFF/, '');
+      dbCache = JSON.parse(raw);
+      dbMtimeMs = stat.mtimeMs;
+    }
+  } catch (e) {
+    if (!dbCache) throw e;
   }
   return dbCache;
 }
@@ -33,6 +48,7 @@ function saveDb() {
   const serialized = JSON.stringify(dbCache, null, 2);
   try {
     fs.writeFileSync(DB_PATH, serialized, 'utf8');
+    dbMtimeMs = fs.statSync(DB_PATH).mtimeMs;
   } catch (err) {
     try {
       fs.writeFileSync(TMP_DB_PATH, serialized, 'utf8');
@@ -262,15 +278,33 @@ function releaseKeyAndRecordUsage({ keyObj, isBansos, client, model, endpoint, p
 }
 
 // ============================================================================
-// MULTI-PROVIDER UPSTREAM ROUTER (Pollinations + Custom OpenAI / 9Router + Smart Fallback)
+// MULTI-PROVIDER UPSTREAM ROUTER (Google Gemini Cluster + Pollinations + Custom OpenAI / 9Router)
 // ============================================================================
+let geminiKeyCursor = 0;
+
+function getGeminiModelCandidates(requestedModelId) {
+  switch (requestedModelId) {
+    case 'claude-opus-4.5':
+    case 'gemini-2.5-pro':
+    case 'claude-sonnet-4.5':
+    case 'gpt-5-codex':
+    case 'grok-4.7':
+      return ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.7-flash'];
+    case 'deepseek-v4.1-flash':
+    case 'mimo-v2.6-flash':
+    case 'qwen-3-coder-plus':
+    default:
+      return ['gemini-3.1-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.6-flash', 'gemini-3.7-flash'];
+  }
+}
+
 async function callUpstreamCompletion({ model, messages, temperature = 0.7, max_tokens = 2048 }) {
   const db = loadDb();
   const modelMeta = db.models.find(m => m.id === model) || {
     id: model || 'claude-sonnet-4.5',
     name: model || 'Claude Sonnet 4.5',
     provider: 'Anthropic',
-    upstreamModel: 'openai'
+    upstreamModel: 'openai-fast'
   };
 
   const enabledUpstreams = (db.upstreams || [])
@@ -288,11 +322,82 @@ async function callUpstreamCompletion({ model, messages, temperature = 0.7, max_
       }))
     : [{ role: 'user', content: 'Hello!' }];
 
-  for (const upstream of enabledUpstreams) {
+  const systemInstruction = {
+    role: 'system',
+    content: `You are ${modelMeta.name} (${modelMeta.provider}), routed via ${db.brand.name} AI Gateway (${db.brand.domain}). Provide accurate, concise, high-quality answers.`
+  };
+
+  // Separate Gemini cluster upstreams for round-robin load balancing
+  const geminiUpstreams = enabledUpstreams.filter(u => u.type === 'google-gemini' && u.apiKey);
+  const otherUpstreams = enabledUpstreams.filter(u => u.type !== 'google-gemini');
+
+  const orderedGemini = [];
+  if (geminiUpstreams.length > 0) {
+    const startIdx = geminiKeyCursor % geminiUpstreams.length;
+    geminiKeyCursor = (geminiKeyCursor + 1) % 100000;
+    for (let i = 0; i < geminiUpstreams.length; i++) {
+      orderedGemini.push(geminiUpstreams[(startIdx + i) % geminiUpstreams.length]);
+    }
+  }
+
+  // 1. Try Google Gemini High-Speed Multi-Key Cluster first
+  if (orderedGemini.length > 0) {
+    const geminiCandidates = getGeminiModelCandidates(modelMeta.id);
+    for (let cIdx = 0; cIdx < geminiCandidates.length; cIdx++) {
+      const targetGeminiModel = geminiCandidates[cIdx];
+      const upstream = orderedGemini[cIdx % orderedGemini.length];
+      const startTs = Date.now();
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 12000);
+        const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${upstream.apiKey}`
+          },
+          body: JSON.stringify({
+            model: targetGeminiModel,
+            messages: [systemInstruction, ...normalizedMessages],
+            temperature
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+
+        if (resp.ok) {
+          const data = await resp.json();
+          const text = data?.choices?.[0]?.message?.content;
+          if (text && typeof text === 'string' && text.trim().length > 0) {
+            const elapsed = Date.now() - startTs;
+            upstream.totalRequests = (upstream.totalRequests || 0) + 1;
+            upstream.avgLatencyMs = Math.round(((upstream.avgLatencyMs || elapsed) * 0.7) + (elapsed * 0.3));
+            upstream.status = 'healthy';
+            saveDb();
+
+            const promptTokens = data?.usage?.prompt_tokens || Math.max(18, Math.ceil(JSON.stringify(normalizedMessages).length / 4));
+            const completionTokens = data?.usage?.completion_tokens || Math.max(24, Math.ceil(text.length / 4));
+
+            return {
+              content: text,
+              promptTokens,
+              completionTokens,
+              upstreamUsed: `${upstream.name} [${targetGeminiModel}]`
+            };
+          }
+        }
+      } catch (_) {
+        // Try next candidate / key in cluster
+      }
+    }
+  }
+
+  // 2. Try other enabled upstreams (Pollinations OpenAI Reasoning / Custom 9Router / OpenRouter)
+  for (const upstream of otherUpstreams) {
     const startTs = Date.now();
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 14000);
+      const timeout = setTimeout(() => controller.abort(), 16000);
 
       let url = upstream.baseUrl.replace(/\/+$/, '');
       if (!url.endsWith('/chat/completions') && !url.endsWith('/openai')) {
@@ -305,17 +410,14 @@ async function callUpstreamCompletion({ model, messages, temperature = 0.7, max_
       }
 
       const payload = {
-        model: upstream.type === 'pollinations' ? (modelMeta.upstreamModel || 'openai') : modelMeta.id,
-        messages: [
-          {
-            role: 'system',
-            content: `You are ${modelMeta.name} (${modelMeta.provider}), routed via ${db.brand.name} AI Gateway (${db.brand.domain}). Provide accurate, concise, high-quality answers.`
-          },
-          ...normalizedMessages
-        ],
+        model: upstream.type === 'pollinations' ? 'openai-fast' : modelMeta.id,
+        messages: [systemInstruction, ...normalizedMessages],
         temperature,
         stream: false
       };
+      if (upstream.type === 'pollinations') {
+        payload.seed = Math.floor(Math.random() * 1000000);
+      }
 
       const resp = await fetch(url, {
         method: 'POST',
@@ -643,7 +745,7 @@ app.get('/api/packages', (req, res) => {
   res.json({ ok: true, packages: db.packages });
 });
 
-app.get('/api/public/config', (req, res) => {
+app.get(['/api/public/config', '/api/config/public'], (req, res) => {
   const db = loadDb();
   const totalCalls = db.usageLogs.length + 14820;
   const avgLatency = db.usageLogs.length
@@ -725,24 +827,57 @@ app.post('/api/demo/chat', async (req, res) => {
 });
 
 // ============================================================================
-// AUTHENTICATION & USER SESSION MIDDLEWARE
+// AUTHENTICATION & USER SESSION MIDDLEWARE (HMAC Persistent Tokens)
 // ============================================================================
+const SESSION_SECRET = process.env.SATUKEY_SESSION_SECRET || 'satukey_hmac_secret_aswadi_2026_v2';
+
+function signUserToken(userId) {
+  return crypto.createHmac('sha256', SESSION_SECRET).update(String(userId)).digest('hex').slice(0, 32);
+}
+
 function createSessionToken(user) {
-  const token = 'sess_' + crypto.randomBytes(24).toString('hex');
+  const sig = signUserToken(user.id);
+  const token = `sess_${user.id}_${sig}`;
   tokenSessions.set(token, user.id);
   return token;
 }
+
+function verifySessionToken(token) {
+  if (!token) return null;
+  if (tokenSessions.has(token)) return tokenSessions.get(token);
+  if (token.startsWith('sess_')) {
+    const parts = token.split('_');
+    if (parts.length >= 3) {
+      const sig = parts[parts.length - 1];
+      const userId = parts.slice(1, -1).join('_');
+      if (signUserToken(userId) === sig) {
+        tokenSessions.set(token, userId);
+        return userId;
+      }
+    }
+  }
+  return null;
+}
+
+app.get('/api/health', (req, res) => {
+  const db = loadDb();
+  const activeUpstreams = (db.upstreams || []).filter(u => u.enabled).length;
+  res.json({
+    ok: true,
+    status: 'online',
+    domain: db.brand?.domain || 'ai.aswadi.my.id',
+    activeUpstreams,
+    autoApproveOnReceiptVerify: !!db.paymentConfig?.seabank?.autoApproveOnReceiptVerify,
+    timestamp: new Date().toISOString()
+  });
+});
 
 function requireAuth(req, res, next) {
   const auth = req.headers['authorization'] || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
   const db = loadDb();
 
-  let userId = tokenSessions.get(token);
-  // Also allow simple deterministic dev token for convenience
-  if (!userId && token.startsWith('uid:')) {
-    userId = token.slice(4);
-  }
+  const userId = verifySessionToken(token);
   const user = db.users.find(u => u.id === userId);
   if (!user) {
     return res.status(401).json({ ok: false, error: 'Silakan login terlebih dahulu.' });
@@ -754,7 +889,7 @@ function requireAuth(req, res, next) {
 function requireAdmin(req, res, next) {
   requireAuth(req, res, () => {
     if (req.user.role !== 'admin') {
-      return res.status(403).json({ ok: false, error: 'Akses khusus Administrator.' });
+      return res.status(403).json({ ok: false, error: 'Akses khusus Administrator. Silakan login menggunakan akun Admin.' });
     }
     next();
   });
@@ -831,10 +966,14 @@ app.post('/api/auth/register', (req, res) => {
 
 app.post('/api/auth/demo', (req, res) => {
   const { role = 'user' } = req.body || {};
+  if (role === 'admin') {
+    return res.status(403).json({
+      ok: false,
+      error: 'Login Cepat Admin dinonaktifkan demi keamanan produksi. Silakan login menggunakan email & password Administrator.'
+    });
+  }
   const db = loadDb();
-  const user = role === 'admin'
-    ? db.users.find(u => u.role === 'admin')
-    : db.users.find(u => u.email === 'demo@aswadi.my.id') || db.users[0];
+  const user = db.users.find(u => u.email === 'demo@aswadi.my.id') || db.users.find(u => u.role === 'user');
   const token = createSessionToken(user);
   res.json({
     ok: true,
@@ -1086,10 +1225,10 @@ app.post('/api/billing/webhook/seabank', (req, res) => {
   }
 
   const targetAmount = Number(amountUnique || amount || 0);
-  const inv = db.invoices.find(i => i.status === 'PENDING' && i.amountUnique === targetAmount);
+  const inv = db.invoices.find(i => (i.status === 'PENDING' || i.status === 'VERIFYING') && i.amountUnique === targetAmount);
 
   if (!inv) {
-    return res.status(404).json({ ok: false, error: `No PENDING invoice matching exact unique amount Rp ${targetAmount}` });
+    return res.status(404).json({ ok: false, error: `No PENDING/VERIFYING invoice matching exact unique amount Rp ${targetAmount}` });
   }
 
   fulfillInvoice(db, inv, `SEABANK_WEBHOOK:${reference || 'AUTO'}`);
@@ -1098,6 +1237,42 @@ app.post('/api/billing/webhook/seabank', (req, res) => {
     message: `Invoice ${inv.id} matched Rp ${targetAmount} and fulfilled automatically!`,
     invoice: inv
   });
+});
+
+// One-Click Instant Owner Approval Endpoint (from WhatsApp / Direct Link)
+app.get('/api/billing/quick-approve', (req, res) => {
+  const { id, secret } = req.query || {};
+  const db = loadDb();
+  const expectedSecret = db.paymentConfig?.seabank?.webhookSecret || 'whsec_seabank_aswadi_2026';
+
+  if (!secret || secret !== expectedSecret) {
+    return res.status(401).send('<h3>401 Unauthorized — Secret tidak valid.</h3>');
+  }
+
+  const inv = db.invoices.find(i => i.id === id);
+  if (!inv) {
+    return res.status(404).send(`<h3>404 — Invoice ${id} tidak ditemukan.</h3>`);
+  }
+
+  fulfillInvoice(db, inv, 'OWNER_QUICK_LINK');
+  return res.send(`
+    <!DOCTYPE html>
+    <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SATUKEY — Approval Berhasil</title>
+    <style>body{background:#07090e;color:#f1f5f9;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:95vh;margin:0;padding:16px}
+    .card{background:#111827;border:1px solid #10b981;border-radius:16px;padding:28px;max-width:460px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(16,185,129,0.2)}
+    .badge{background:rgba(16,185,129,0.2);color:#34d399;padding:6px 14px;border-radius:99px;font-weight:bold;font-size:13px;display:inline-block;margin-bottom:12px}
+    a{display:inline-block;margin-top:18px;background:#10b981;color:#022c22;font-weight:bold;text-decoration:none;padding:10px 20px;border-radius:10px}</style></head>
+    <body><div class="card">
+      <div class="badge">✅ INVOICE LUNAS (PAID)</div>
+      <h2 style="margin:8px 0">${inv.id}</h2>
+      <p style="color:#94a3b8;font-size:14px">User: <strong style="color:#fff">${inv.userEmail}</strong><br>
+      Paket: <strong style="color:#34d399">${inv.packageName}</strong><br>
+      Nominal Unik: <strong style="color:#fbbf24">Rp ${inv.amountUnique.toLocaleString('id-ID')}</strong></p>
+      <p style="font-size:13px;color:#cbd5e1">Saldo & API Key paket user telah otomatis diaktifkan!</p>
+      <a href="https://ai.aswadi.my.id">Buka Dashboard SATUKEY →</a>
+    </div></body></html>
+  `);
 });
 
 // Instant Receipt Verification Endpoint for User Checkout Modal
@@ -1125,13 +1300,16 @@ app.post('/api/billing/verify-receipt', requireAuth, (req, res) => {
     });
   }
 
+  inv.status = 'VERIFYING';
   inv.verificationRequested = true;
-  inv.transferNote = transferNote;
+  inv.verificationRequestedAt = new Date().toISOString();
+  inv.transferNote = transferNote || 'Konfirmasi Transfer User';
   saveDb();
   return res.json({
     ok: true,
+    pendingVerification: true,
     invoice: inv,
-    message: 'Bukti transfer diterima dan sedang diverifikasi otomatis oleh sistem.'
+    message: `Konfirmasi transfer Rp ${inv.amountUnique.toLocaleString('id-ID')} berhasil dikirim! Sistem sedang memverifikasi mutasi SeaBank / QRIS Anda (1–3 menit). Paket & saldo akan aktif otomatis begitu mutasi terkonfirmasi.`
   });
 });
 
@@ -1145,7 +1323,10 @@ app.get('/api/admin/overview', requireAdmin, (req, res) => {
     brand: db.brand,
     paymentConfig: db.paymentConfig,
     packages: db.packages,
-    upstreams: db.upstreams,
+    upstreams: (db.upstreams || []).map(u => ({
+      ...u,
+      apiKey: u.apiKey ? `${u.apiKey.slice(0, 8)}...${u.apiKey.slice(-4)}` : ''
+    })),
     bansos: db.bansos,
     users: db.users.map(u => ({
       id: u.id,
