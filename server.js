@@ -22,6 +22,14 @@ app.use((req, res, next) => {
 });
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get(['/store', '/store/'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'store', 'index.html'));
+});
+
+app.get(['/downloads', '/downloads/'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'downloads', 'index.html'));
+});
+
 // ============================================================================
 // DATABASE HELPER (JSON Persistent Store with Serverless /tmp Fallback)
 // ============================================================================
@@ -1416,6 +1424,89 @@ app.post('/api/admin/invoices/:id/approve', requireAdmin, (req, res) => {
   if (!inv) return res.status(404).json({ ok: false, error: 'Invoice tidak ditemukan.' });
   fulfillInvoice(db, inv, `ADMIN:${req.user.email}`);
   res.json({ ok: true, invoice: inv });
+});
+
+// ============================================================================
+// ASWADI AI VENTURE STORE & CLEANPROMPTER AI STUDIO ENDPOINTS
+// ============================================================================
+app.post('/api/store/prompter-script', async (req, res) => {
+  const { topic = '', style = 'tiktok-indonesia', duration = '60s' } = req.body || {};
+  const isEn = style.includes('english') || style === 'sales-pitch';
+  const fallbackScript = isEn
+    ? `Stop scrolling for 10 seconds!\n\nHere is the truth about "${topic}":\n\nMost creators spend hours memorizing lines or looking away from the camera lens.\n\nWith CleanPrompter AI Studio, your script floats right below your camera lens—so your eyes stay 100% locked on your audience while you record in HD.\n\nTap the link below to try it live or grab the White-Label source code today!`
+    : `Stop scroll 10 detik aja teman-teman!\n\nKita bahas jujur soal: "${topic}".\n\nBanyak orang pengen mulai bikin konten atau bangun bisnis digital, tapi bingung mulai dari mana dan sering kaku waktu ngomong di depan kamera.\n\nSekarang dengan bantuan AI dan CleanPrompter Studio ini, naskah kamu langsung dibuatkan otomatis dan jalan tepat di bawah lensa kamera—jadi mata kamu tetap fokus 100% menatap penonton!\n\nYuk langsung cobain sekarang atau miliki source code aplikasinya di Aswadi AI Store!`;
+  try {
+    const db = loadDb();
+    const up = (db.upstreams || []).find(u => u.enabled && u.apiKey);
+    if (!up) return res.json({ ok: true, script: fallbackScript });
+    const prompt = isEn
+      ? `Write a high-retention ${duration} camera teleprompter script about: "${topic}". Style: ${style}. Format as clean spoken paragraphs separated by blank lines so it is easy to read on a teleprompter. No stage directions or brackets, only spoken words.`
+      : `Buatkan naskah teleprompter kamera berdurasi ${duration} yang sangat menarik (hook kuat di 3 detik pertama, isi padat, dan ajakan bertindak/CTA di akhir) tentang topik: "${topic}". Gunakan bahasa Indonesia kasual yang enak diucapkan saat rekaman TikTok/Reels. Tulis hanya kalimat yang diucapkan tanpa instruksi panggung.`;
+    const r = await fetch(up.baseUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${up.apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gemini-2.5-flash',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7
+      })
+    });
+    const j = await r.json();
+    const text = j?.choices?.[0]?.message?.content?.trim();
+    return res.json({ ok: true, script: text || fallbackScript });
+  } catch (_) {
+    return res.json({ ok: true, script: fallbackScript });
+  }
+});
+
+app.post('/api/store/order', (req, res) => {
+  const orderId = 'ORD-STORE-' + Date.now();
+  const order = {
+    orderId,
+    createdAt: new Date().toISOString(),
+    ...(req.body || {})
+  };
+  try {
+    const storeOrdersPath = path.join(__dirname, 'data', 'store_orders.json');
+    const existing = fs.existsSync(storeOrdersPath)
+      ? JSON.parse(fs.readFileSync(storeOrdersPath, 'utf8'))
+      : [];
+    existing.unshift(order);
+    fs.writeFileSync(storeOrdersPath, JSON.stringify(existing, null, 2), 'utf8');
+  } catch (_) {}
+
+  // Automatically relay order / buyer offer to Lia so Lia immediately notifies Boss via WhatsApp!
+  const waSummary = `🚨 ORDER / PENAWARAN BARU DI ASWADI STORE (${orderId}): Produk="${order.productName || order.productId || '-'}" | Tier="${order.tierName || '-'}" | Harga="${order.priceLabel || order.offerAmount || '-'}" | Pembeli="${order.buyerContact || order.email || '-'}" | Catatan="${order.notes || '-'}". Mohon Lia langsung teruskan notifikasi ini ke WhatsApp Bos (Beb) sekarang!`;
+  for (const liaUrl of ['http://192.168.0.185:8766/report', 'http://192.168.0.132:8766/report']) {
+    fetch(liaUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        taskId: `WA_ALERT_${orderId}`,
+        agent: 'Nai Store Checkout Webhook',
+        status: 'SEND_WHATSAPP_TO_BOSS_NOW',
+        summary: waSummary,
+        output: JSON.stringify(order)
+      })
+    }).catch(() => {});
+  }
+
+  res.json({ ok: true, orderId, order });
+});
+
+app.get('/api/store/orders', (req, res) => {
+  try {
+    const storeOrdersPath = path.join(__dirname, 'data', 'store_orders.json');
+    const existing = fs.existsSync(storeOrdersPath)
+      ? JSON.parse(fs.readFileSync(storeOrdersPath, 'utf8'))
+      : [];
+    res.json({ ok: true, count: existing.length, orders: existing });
+  } catch (e) {
+    res.json({ ok: true, count: 0, orders: [] });
+  }
 });
 
 // SPA Fallback

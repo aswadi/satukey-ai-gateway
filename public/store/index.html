@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aswadi AI Venture Store — Turnkey Micro-SaaS, AI Apps & White-Label Source Code</title>
+  <meta name="description" content="Buy production-ready AI Micro-SaaS apps, White-Label source code, or full exclusive IP buyouts. Instant checkout via QRIS, BCA, SeaBank, or USDC/USDT on Base." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --card: #0f1420;
+      --border: rgba(255,255,255,0.1);
+      --accent: #6366f1;
+      --cyan: #06b6d4;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at top right, rgba(99,102,241,0.16), transparent 45%), var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    nav {
+      border-bottom: 1px solid var(--border);
+      background: rgba(7, 9, 14, 0.88);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+    .market-switch {
+      display: inline-flex;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 4px;
+    }
+    .market-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .market-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      color: #fff;
+    }
+    .hero {
+      padding: 56px 0 36px;
+      text-align: center;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: clamp(2rem, 4.2vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .hero p {
+      max-width: 740px;
+      margin: 0 auto 26px;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 22px;
+      padding-bottom: 64px;
+    }
+    .app-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .app-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.5);
+    }
+    .app-card.featured {
+      border: 2px solid #38bdf8;
+      box-shadow: 0 20px 50px rgba(6, 182, 212, 0.14);
+    }
+    .ribbon {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .tag-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+    .tag {
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.06);
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+    .tier-box {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 14px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tier-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+    .tier-row:hover { border-color: rgba(56, 189, 248, 0.45); }
+    .tier-name { font-size: 0.82rem; font-weight: 700; }
+    .tier-sub { font-size: 0.7rem; color: var(--muted); }
+    .tier-price { font-size: 0.95rem; font-weight: 800; color: #38bdf8; }
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn {
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      transition: all 0.18s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.12); }
+    .btn-buy {
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      border: none;
+      color: #fff;
+    }
+
+    /* Checkout Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: #111624;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 22px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .pay-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .pay-tab {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .pay-tab.active {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.14);
+      color: #38bdf8;
+    }
+    .bank-box {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 0.84rem;
+    }
+    .input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      margin-bottom: 10px;
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container nav-inner">
+      <a href="/store/" class="logo">
+        <div class="logo-badge">A</div>
+        <div>
+          <div>Aswadi AI Venture Store</div>
+          <div style="font-size:0.7rem;color:var(--muted);font-weight:500;">Turnkey AI Apps, Micro-SaaS & White-Label Source Code</div>
+        </div>
+      </a>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="market-switch">
+          <button class="market-btn active" id="btnGlobal" onclick="setMarket('global')">🌍 Global (USD / USDC)</button>
+          <button class="market-btn" id="btnIndo" onclick="setMarket('id')">🇮🇩 Indonesia (IDR / QRIS)</button>
+        </div>
+        <a href="/prompter/" class="btn" style="padding:7px 12px;font-size:0.78rem;">🎥 Try CleanPrompter Live</a>
+        <a href="/satukey" class="btn" style="padding:7px 12px;font-size:0.78rem;">⚡ SATUKEY API</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero container">
+    <div class="pill">🔥 Instant Delivery • Full Source Code & Turnkey Acquisition Available</div>
+    <h1 id="heroTitle">Own Revenue-Ready AI Apps & Micro-SaaS Today</h1>
+    <p id="heroSub">
+      Launch your own software business in minutes. Buy a commercial license, White-Label Developer Source Code (100% customizable, zero royalties), or acquire full exclusive ownership.
+    </p>
+  </section>
+
+  <main class="container">
+    <div class="grid" id="appsGrid"></div>
+  </main>
+
+  <!-- Instant Checkout Modal -->
+  <div class="modal-backdrop" id="checkoutModal">
+    <div class="modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 id="modalTitle" style="font-size:1.15rem;">Complete Your Order</h3>
+        <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;">✕</button>
+      </div>
+      <div id="modalProductSummary" style="padding:12px;border-radius:12px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);margin-bottom:12px;"></div>
+
+      <div class="pay-tabs">
+        <div class="pay-tab active" id="tabCrypto" onclick="switchPayTab('crypto')">🌐 Global (USDC / USDT / Offer)</div>
+        <div class="pay-tab" id="tabIdr" onclick="switchPayTab('idr')">🇮🇩 Indonesia (QRIS / BCA / SeaBank)</div>
+      </div>
+
+      <!-- Global Crypto & Escrow Section -->
+      <div id="sectionCrypto">
+        <div class="bank-box">
+          <div style="font-weight:800;color:#38bdf8;margin-bottom:4px;">⚡ Instant On-Chain Settlement (USDC / USDT / ETH)</div>
+          <div style="font-size:0.76rem;color:var(--muted);margin-bottom:6px;">Supported Networks: <strong>Base, Arbitrum, Polygon, BNB Chain (BSC), Ethereum Mainnet</strong></div>
+          <div style="background:#07090e;padding:9px;border-radius:8px;font-family:monospace;font-size:0.78rem;word-break:break-all;border:1px solid var(--border);">
+            0x74B719438eB0551D3270C988eBe483a24F9c2E89
+          </div>
+          <button class="btn" style="margin-top:8px;padding:6px 10px;font-size:0.75rem;" onclick="navigator.clipboard.writeText('0x74B719438eB0551D3270C988eBe483a24F9c2E89');this.textContent='✅ Wallet Address Copied!'">📋 Copy Wallet Address</button>
+        </div>
+      </div>
+
+      <!-- Indonesia QRIS / Bank Transfer Section -->
+      <div id="sectionIdr" style="display:none;">
+        <div class="bank-box" style="text-align:center;">
+          <div style="font-weight:800;color:#34d399;margin-bottom:6px;">📱 Scan Official GoPay Merchant QRIS (ASWADI ACADEMY)</div>
+          <img src="/qris_aswadi_academy.jpg" alt="QRIS Aswadi Academy" style="max-width:210px;border-radius:12px;border:2px solid #fff;margin:6px auto;display:block;" />
+          <div style="font-size:0.74rem;color:var(--muted);">NMID: ID1026631733064 • Mendukung GoPay, OVO, DANA, ShopeePay, BCA, Mandiri, BRI, SeaBank</div>
+        </div>
+        <div class="bank-box">
+          <div>🏦 <strong>BCA:</strong> <code>0214224531</code> a/n <strong>M. ASWADI</strong></div>
+          <div style="margin-top:4px;">🏦 <strong>SeaBank:</strong> <code>901482290090</code> a/n <strong>M. ASWADI</strong></div>
+        </div>
+      </div>
+
+      <form onsubmit="submitOrder(event)">
+        <input class="input" type="text" id="buyerName" placeholder="Your Name / Company Name *" required />
+        <input class="input" type="text" id="buyerContact" placeholder="Email / WhatsApp / Telegram (@username) for Instant Delivery *" required />
+        <input class="input" type="text" id="buyerTx" placeholder="Payment TX Hash / Bank Transfer Reference (or type 'MAKE OFFER')" required />
+        <button type="submit" class="btn btn-buy" style="width:100%;font-size:0.92rem;" id="btnSubmitOrder">
+          🚀 Submit Order & Get Instant Download Link
+        </button>
+      </form>
+      <div id="orderResult" style="margin-top:12px;display:none;padding:12px;border-radius:12px;background:rgba(16,185,129,0.16);border:1px solid #10b981;color:#34d399;font-size:0.84rem;"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentMarket = 'global';
+    let selectedApp = null;
+    let selectedTier = null;
+
+    const APPS = [
+      {
+        id: 'cleanprompter',
+        featured: true,
+        ribbon: '🔥 Flagship • Like $2,000 Reel App',
+        name: 'CleanPrompter AI Studio (v2.0 PWA)',
+        descGlobal: 'Eye-contact camera teleprompter + built-in WebRTC HD video recorder & AI viral script writer for TikTok, Reels, Shorts & YouTube creators. Runs on iOS, Android & Desktop without App Store fees.',
+        descId: 'Aplikasi Teleprompter Kamera + Perekam Video HD & AI Pembuat Skrip Konten Viral (TikTok/Reels/Shorts). Jalan langsung di iPhone, Android & Laptop tanpa biaya tahunan App Store.',
+        demoUrl: '/prompter/',
+        tags: ['iOS/Android PWA', 'WebRTC Recorder', 'AI Script Writer', 'Zero Dependencies'],
+        tiers: [
+          { id: 'pro', nameGlobal: 'Creator Pro License', nameId: 'Lisensi Kreator Pro', sub: 'Lifetime access + AI Script Generator', usd: '$19', idr: 'Rp 99.000' },
+          { id: 'whitelabel', nameGlobal: 'White-Label Full Source Code', nameId: 'Source Code White-Label (Bebas Jual Ulang)', sub: '100% Full Source Code + Rebrand & Resell Rights', usd: '$149', idr: 'Rp 499.000' },
+          { id: 'buyout', nameGlobal: 'Full Turnkey SaaS Buyout / Acquisition', nameId: 'Akuisisi Penuh / Turnkey Custom Domain', sub: 'Custom Brand Deployment + AI Backend + 30d Support', usd: '$1,450', idr: 'Rp 4.500.000' }
+        ]
+      },
+      {
+        id: 'satukey-gateway',
+        featured: true,
+        ribbon: '⚡ Best-Selling AI SaaS',
+        name: 'SATUKEY Enterprise AI API Gateway',
+        descGlobal: 'Complete Multi-LLM API Gateway (OpenAI / Anthropic Claude Code / Cursor / Cline compatible) with per-key quota billing, Dynamic QRIS, Bank & Crypto checkout, and Admin Dashboard.',
+        descId: 'Source Code Lengkap Platform SaaS AI API Gateway (seperti OpenRouter). Mendukung Cursor, Claude Code, Cline, billing kuota token otomatis, Dynamic QRIS, BCA & SeaBank.',
+        demoUrl: '/satukey',
+        tags: ['Node.js + Express', 'OpenAI & Anthropic Proxy', 'Dynamic QRIS CRC16', 'Admin Panel'],
+        tiers: [
+          { id: 'whitelabel', nameGlobal: 'White-Label SaaS Source Code', nameId: 'Source Code Lengkap SaaS Gateway', sub: 'Full Backend + Frontend + Admin Dashboard', usd: '$199', idr: 'Rp 750.000' },
+          { id: 'buyout', nameGlobal: 'Turnkey Installed AI Business', nameId: 'Paket Turnkey Siap Jualan + Setup Server', sub: 'Full Setup on Your Domain + Upstream Key Routing', usd: '$1,950', idr: 'Rp 6.500.000' }
+        ]
+      },
+      {
+        id: 'wa-ai-crm',
+        featured: true,
+        ribbon: '💬 #1 Most Wanted B2B AI App',
+        name: 'WA-Flow AI CRM & Auto-Closing CS Bot (v2.4)',
+        descGlobal: '24/7 Multi-Agent WhatsApp AI Customer Service Bot, Anti-Ban Broadcast Campaign Manager, Lead Pipeline CRM & Instant QRIS/Payment Link Generator.',
+        descId: 'Sistem Robot CS WhatsApp AI Otomatis 24 Jam, Broadcast Promo Anti-Banned, CRM Pipeline Prospek & Pembuat Tagihan QRIS Otomatis untuk Toko Online, Klinik & Agensi.',
+        demoUrl: '/demo/wa-ai-crm.html',
+        tags: ['WhatsApp AI CS', 'Broadcast Engine', 'CRM Pipeline', 'Auto-QRIS Closing'],
+        tiers: [
+          { id: 'whitelabel', nameGlobal: 'White-Label Full Source Code', nameId: 'Source Code Lengkap + Hak Jual ke Klien', sub: '100% Full Source Code + Unlimited Client Installs', usd: '$99', idr: 'Rp 349.000' },
+          { id: 'buyout', nameGlobal: 'Turnkey SaaS / Agency Deployment', nameId: 'Paket Terima Beres + Integrasi WA Bisnis', sub: 'Full Server Setup + Custom Knowledge Base AI', usd: '$690', idr: 'Rp 2.450.000' }
+        ]
+      },
+      {
+        id: 'invoice-kilat-ai',
+        featured: false,
+        ribbon: '🧾 FinTech & OCR Automation',
+        name: 'InvoiceKilat AI — Smart OCR Receipt & Billing',
+        descGlobal: 'AI-powered receipt/invoice OCR scanner to Excel journal + instant branded PDF Invoice & Payment Link generator for freelancers, agencies, and SMEs.',
+        descId: 'Aplikasi Scan Foto Nota/Struk Belanja ke Jurnal Excel otomatis dengan AI OCR + Generator Invoice Resmi PDF ber-QRIS dalam 5 detik.',
+        demoUrl: '/demo/invoice-kilat-ai.html',
+        tags: ['AI Vision OCR', 'PDF Invoice Generator', 'Excel Bookkeeping', 'QRIS Billing'],
+        tiers: [
+          { id: 'whitelabel', nameGlobal: 'Full Developer Source Code', nameId: 'Source Code Lengkap + Bebas Rebrand', sub: 'Full Frontend + AI OCR Integration', usd: '$79', idr: 'Rp 249.000' },
+          { id: 'buyout', nameGlobal: 'Turnkey FinTech Micro-SaaS', nameId: 'Instalasi Kustom + Domain Perusahaan', sub: 'Custom Branding + Cloud Hosting Setup', usd: '$550', idr: 'Rp 1.850.000' }
+        ]
+      },
+      {
+        id: 'pos-kasir',
+        featured: false,
+        ribbon: '🏪 Retail & F&B Ready',
+        name: 'KasirPintar Cloud POS & Inventory',
+        descGlobal: 'Modern Point-of-Sale (POS) web application with barcode scanner, thermal receipt printing (58mm/80mm), real-time stock alerts, cashier shifts, and profit margin analytics.',
+        descId: 'Aplikasi Kasir (POS) & Inventori Toko/UMKM siap pakai. Mendukung cetak struk Bluetooth/USB 58mm, laporan laba rugi harian, manajemen stok, dan multi-kasir.',
+        demoUrl: '/demo/pos-kasir.html',
+        tags: ['Point of Sale', 'Thermal Receipt', 'Inventory Alerts', 'B2B UMKM'],
+        tiers: [
+          { id: 'whitelabel', nameGlobal: 'Full Developer Source Code', nameId: 'Source Code Lengkap + Hak Jual ke Klien', sub: 'Unlimited Client Installations', usd: '$79', idr: 'Rp 250.000' },
+          { id: 'buyout', nameGlobal: 'Custom Enterprise Deployment', nameId: 'Instalasi Kustom + Branding Toko', sub: 'Ready for Multi-Branch Retail/Cafe', usd: '$490', idr: 'Rp 1.750.000' }
+        ]
+      },
+      {
+        id: 'kantin-digital',
+        featured: false,
+        ribbon: '🍽️ QR Table Ordering',
+        name: 'KantinQR Multi-Tenant Food Ordering',
+        descGlobal: 'Contactless QR table ordering & kitchen display system (KDS) for food courts, cafes, and school/office canteens with automated tenant settlement.',
+        descId: 'Sistem Pemesanan Makanan via Scan QR Meja + Layar Dapur (Kitchen Display System) & bagi hasil otomatis antar tenant kantin/foodcourt.',
+        demoUrl: '/demo/kantin-digital.html',
+        tags: ['QR Table Order', 'Kitchen Display', 'Multi-Vendor', 'QRIS Ready'],
+        tiers: [
+          { id: 'whitelabel', nameGlobal: 'Full Developer Source Code', nameId: 'Source Code Lengkap Multi-Tenant', sub: 'Unlimited Restaurant/Canteen Clients', usd: '$99', idr: 'Rp 350.000' },
+          { id: 'buyout', nameGlobal: 'Turnkey Foodcourt System', nameId: 'Sistem Siap Pakai + Kustomisasi Menu', sub: 'Includes QR Table Generator & Setup', usd: '$590', idr: 'Rp 2.250.000' }
+        ]
+      }
+    ];
+
+    function renderApps() {
+      const isGlobal = currentMarket === 'global';
+      document.getElementById('heroTitle').textContent = isGlobal
+        ? 'Own Revenue-Ready AI Apps & Micro-SaaS Today'
+        : 'Miliki Aplikasi AI & Source Code Siap Jual Hari Ini';
+      document.getElementById('heroSub').textContent = isGlobal
+        ? 'Launch your own software business in minutes. Buy a commercial license, White-Label Developer Source Code (100% customizable, zero royalties), or acquire full turnkey ownership.'
+        : 'Bangun bisnis software & AI kamu sendiri tanpa mulai dari nol. Beli lisensi pakai, Source Code White-Label (bebas ganti nama & jual ulang 100% untung milikmu), atau paket Turnkey terima beres!';
+
+      const grid = document.getElementById('appsGrid');
+      grid.innerHTML = APPS.map(app => `
+        <div class="app-card ${app.featured ? 'featured' : ''}">
+          <div>
+            <span class="ribbon">${app.ribbon}</span>
+            <h2 style="font-size:1.22rem;font-weight:800;margin-top:6px;padding-right:110px;">${app.name}</h2>
+            <div class="tag-row">
+              ${app.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+            </div>
+            <p style="font-size:0.88rem;color:var(--muted);">
+              ${isGlobal ? app.descGlobal : app.descId}
+            </p>
+            <div class="tier-box">
+              ${app.tiers.map((t, idx) => `
+                <div class="tier-row" onclick="openCheckout('${app.id}', '${t.id}')">
+                  <div>
+                    <div class="tier-name">${isGlobal ? t.nameGlobal : t.nameId}</div>
+                    <div class="tier-sub">${t.sub}</div>
+                  </div>
+                  <div class="tier-price">${isGlobal ? t.usd : t.idr}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="btn-row">
+            <a href="${app.demoUrl}" class="btn" target="_blank">🔍 Live Demo</a>
+            <button class="btn btn-buy" onclick="openCheckout('${app.id}', '${app.tiers[0].id}')">
+              ⚡ ${isGlobal ? 'Buy / Acquire Now' : 'Beli / Akuisisi Sekarang'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setMarket(m) {
+      currentMarket = m;
+      document.getElementById('btnGlobal').classList.toggle('active', m === 'global');
+      document.getElementById('btnIndo').classList.toggle('active', m === 'id');
+      switchPayTab(m === 'global' ? 'crypto' : 'idr');
+      renderApps();
+    }
+
+    function switchPayTab(tab) {
+      document.getElementById('tabCrypto').classList.toggle('active', tab === 'crypto');
+      document.getElementById('tabIdr').classList.toggle('active', tab === 'idr');
+      document.getElementById('sectionCrypto').style.display = tab === 'crypto' ? 'block' : 'none';
+      document.getElementById('sectionIdr').style.display = tab === 'idr' ? 'block' : 'none';
+    }
+
+    function openCheckout(appId, tierId) {
+      selectedApp = APPS.find(a => a.id === appId) || APPS[0];
+      selectedTier = selectedApp.tiers.find(t => t.id === tierId) || selectedApp.tiers[0];
+      const isGlobal = currentMarket === 'global';
+      document.getElementById('modalProductSummary').innerHTML = `
+        <div style="font-weight:800;font-size:0.98rem;">${selectedApp.name}</div>
+        <div style="font-size:0.84rem;color:#cbd5e1;">Package: <strong>${isGlobal ? selectedTier.nameGlobal : selectedTier.nameId}</strong></div>
+        <div style="font-size:1.1rem;font-weight:800;color:#38bdf8;margin-top:4px;">Price: ${selectedTier.usd} / ${selectedTier.idr}</div>
+      `;
+      document.getElementById('orderResult').style.display = 'none';
+      document.getElementById('checkoutModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('checkoutModal').classList.remove('open');
+    }
+
+    async function submitOrder(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitOrder');
+      btn.disabled = true;
+      btn.textContent = '⏳ Processing Order...';
+      const payload = {
+        appId: selectedApp?.id,
+        appName: selectedApp?.name,
+        tierId: selectedTier?.id,
+        priceUsd: selectedTier?.usd,
+        priceIdr: selectedTier?.idr,
+        buyerName: document.getElementById('buyerName').value.trim(),
+        buyerContact: document.getElementById('buyerContact').value.trim(),
+        paymentProof: document.getElementById('buyerTx').value.trim(),
+        market: currentMarket
+      };
+      try {
+        const res = await fetch('/api/store/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        const box = document.getElementById('orderResult');
+        box.style.display = 'block';
+        box.innerHTML = `✅ <strong>Order Recorded (ID: ${data.orderId || 'ORD-' + Date.now()})!</strong><br/>Our automated fulfillment engine has logged your order and notified our team for instant source code / license delivery to <strong>${payload.buyerContact}</strong>.`;
+      } catch (_) {}
+      btn.disabled = false;
+      btn.textContent = '🚀 Submit Order & Get Instant Download Link';
+    }
+
+    renderApps();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('buyout') === 'cleanprompter') {
+      openCheckout('cleanprompter', 'buyout');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CleanPrompter AI Studio — Eye-Contact Camera Teleprompter & AI Script Writer</title>
+  <meta name="description" content="Record crisp TikTok, Reels, Shorts & YouTube videos while reading your script right at the camera lens. Built-in AI Viral Script Generator & HD Video Recorder." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090b10;
+      --panel: rgba(18, 22, 33, 0.88);
+      --border: rgba(255, 255, 255, 0.12);
+      --accent: #6366f1;
+      --accent2: #06b6d4;
+      --green: #10b981;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: rgba(12, 15, 24, 0.95);
+      border-bottom: 1px solid var(--border);
+      z-index: 30;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.35);
+    }
+    .badge-pro {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      font-weight: 700;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .btn-buyout {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      border: none;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      flex: 1;
+      min-height: calc(100vh - 61px);
+    }
+    @media (max-width: 960px) {
+      .workspace { grid-template-columns: 1fr; }
+    }
+    .sidebar {
+      background: #0d111a;
+      border-right: 1px solid var(--border);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .card-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 0.86rem;
+      outline: none;
+    }
+    textarea {
+      min-height: 170px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    input[type="range"] { flex: 1; accent-color: #38bdf8; }
+    .stage {
+      position: relative;
+      background: #05070b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow: hidden;
+    }
+    .camera-frame {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      aspect-ratio: 9 / 16;
+      max-height: 84vh;
+      background: #111827;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.16);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.75);
+      transition: all 0.25s ease;
+    }
+    .camera-frame.landscape {
+      max-width: 920px;
+      aspect-ratio: 16 / 9;
+    }
+    video#camPreview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      transition: filter 0.25s;
+    }
+    video#camPreview.unmirrored { transform: scaleX(1); }
+    video#camPreview.cinematic { filter: contrast(1.08) saturate(1.12) brightness(1.03); }
+
+    /* Eye-contact teleprompter overlay pinned near top camera lens */
+    .prompter-box {
+      position: absolute;
+      top: 18px;
+      left: 16px;
+      right: 16px;
+      height: 44%;
+      background: rgba(8, 11, 18, 0.62);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+    .eye-line-badge {
+      text-align: center;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px;
+      background: rgba(56, 189, 248, 0.18);
+      color: #7dd3fc;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .reading-zone {
+      position: relative;
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 20px 120px 20px;
+      scroll-behavior: auto;
+      scrollbar-width: none;
+    }
+    .reading-zone::-webkit-scrollbar { display: none; }
+    .focus-bar {
+      position: absolute;
+      top: 42px;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: rgba(250, 204, 21, 0.12);
+      border-top: 1px dashed rgba(250, 204, 21, 0.55);
+      border-bottom: 1px dashed rgba(250, 204, 21, 0.55);
+      pointer-events: none;
+      z-index: 12;
+    }
+    #prompterTextDisplay {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.52;
+      color: #ffffff;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.85);
+      white-space: pre-wrap;
+      text-align: center;
+    }
+    .mirror-text { transform: scaleX(-1); }
+
+    /* Bottom Floating Camera Controls */
+    .cam-controls {
+      position: absolute;
+      bottom: 18px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(10, 14, 23, 0.82);
+      backdrop-filter: blur(12px);
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      z-index: 15;
+      flex-wrap: wrap;
+    }
+    .rec-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--red);
+      display: inline-block;
+    }
+    .rec-active .rec-dot {
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.45; }
+    }
+    .status-pill {
+      position: absolute;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #fde047;
+      z-index: 15;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-icon">C</div>
+      <div>
+        <div>CleanPrompter AI Studio <span class="badge-pro">v2.0 PWA</span></div>
+        <div style="font-size:0.73rem;color:var(--muted);font-weight:500;">Eye-Contact Camera Teleprompter + AI Viral Script Writer</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="/store/" class="btn btn-buyout">💎 Buy Source Code / White-Label ($149 / Rp 499rb)</a>
+      <a href="/store/?buyout=cleanprompter" class="btn btn-primary">🚀 Acquire Full App Rights ($1,450)</a>
+      <a href="/satukey" class="btn">⚡ SATUKEY API</a>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <aside class="sidebar">
+      <!-- AI Viral Script Generator -->
+      <div class="card">
+        <div class="card-title">
+          <span>✨ 1. AI Viral Script Writer</span>
+          <span style="font-size:0.7rem;color:#34d399;">Powered by SATUKEY</span>
+        </div>
+        <div style="margin-bottom:8px;">
+          <label>Content Topic / Product Idea</label>
+          <input type="text" id="aiTopic" placeholder="e.g. Cara cari $2000 dari aplikasi AI / Review kopi..." value="Rahasia bikin aplikasi micro-SaaS dengan AI dan menjualnya ke pasar global" />
+        </div>
+        <div class="row-2" style="margin-bottom:10px;">
+          <div>
+            <label>Style / Hook</label>
+            <select id="aiStyle">
+              <option value="tiktok-indonesia">🇮🇩 TikTok / Reels Viral (ID)</option>
+              <option value="tiktok-english">🇺🇸 TikTok / Shorts Hook (EN)</option>
+              <option value="sales-pitch">💰 High-Converting Sales Pitch</option>
+              <option value="storytelling">🎙️ Founder Storytelling</option>
+            </select>
+          </div>
+          <div>
+            <label>Duration</label>
+            <select id="aiDuration">
+              <option value="30s">30 Sec (~75 words)</option>
+              <option value="60s" selected>60 Sec (~140 words)</option>
+              <option value="90s">90 Sec (~210 words)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="generateScript()" id="btnGenScript">
+          ⚡ Generate Teleprompter Script
+        </button>
+      </div>
+
+      <!-- Script Editor -->
+      <div class="card">
+        <div class="card-title">
+          <span>📜 2. Teleprompter Script</span>
+          <span id="wordCountBadge" style="font-size:0.72rem;color:var(--muted);">~45 sec read</span>
+        </div>
+        <textarea id="scriptInput" oninput="syncScript()">Halo teman-teman! Pernah kepikiran nggak gimana caranya kreator bisa ngomong lancar banget di depan kamera tanpa kelihatan baca teks?
+
+Rahasianya ada di CleanPrompter AI Studio ini!
+
+Teksnya jalan tepat di bawah lensa kamera depan HP atau laptop kamu, jadi mata kamu tetap fokus 100% menatap penonton.
+
+Bukan cuma itu: kalau kamu kehabisan ide konten, tinggal ketik topiknya di sebelah kiri, dan AI langsung buatkan naskah hook TikTok & Reels yang siap kamu bacakan detik ini juga!
+
+Yuk cobain langsung atau miliki source code White-Label aplikasi ini di Aswadi AI Store sekarang!</textarea>
+      </div>
+
+      <!-- Teleprompter & Camera Settings -->
+      <div class="card">
+        <div class="card-title"><span>🎛️ 3. Prompter & Camera Controls</span></div>
+        <div class="slider-row">
+          <label style="margin:0;min-width:85px;">Speed: <strong id="speedVal">3</strong>x</label>
+          <input type="range" id="speedRange" min="1" max="10" step="0.5" value="3" oninput="document.getElementById('speedVal').textContent=this.value" />
+        </div>
+        <div class="slider-row">
+          <label style="margin:0;min-width:85px;">Font: <strong id="fontVal">24</strong>px</label>
+          <input type="range" id="fontRange" min="16" max="42" step="1" value="24" oninput="updateFont(this.value)" />
+        </div>
+        <div class="slider-row">
+          <label style="margin:0;min-width:85px;">Opacity: <strong id="opVal">62</strong>%</label>
+          <input type="range" id="opRange" min="20" max="95" step="5" value="62" oninput="updateOpacity(this.value)" />
+        </div>
+        <div class="row-2" style="margin-top:12px;">
+          <button class="btn" onclick="toggleAspect()" id="btnAspect">📱 9:16 Vertical</button>
+          <button class="btn" onclick="toggleMirrorCam()">🪞 Flip Camera</button>
+          <button class="btn" onclick="toggleMirrorText()">🔄 Mirror Text</button>
+          <button class="btn" onclick="toggleCinematic()">✨ Studio Filter</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Camera & Eye-Level Teleprompter Stage -->
+    <main class="stage">
+      <div class="camera-frame" id="cameraFrame">
+        <video id="camPreview" autoplay playsinline muted class="cinematic"></video>
+
+        <div class="prompter-box" id="prompterBox">
+          <div class="eye-line-badge">👀 LOOK HERE — EYE-CONTACT ZONE NEAR CAMERA LENS</div>
+          <div class="focus-bar"></div>
+          <div class="reading-zone" id="readingZone">
+            <div id="prompterTextDisplay"></div>
+          </div>
+        </div>
+
+        <div class="status-pill" id="statusPill">🎥 Camera Ready • Press Play to Scroll</div>
+
+        <div class="cam-controls">
+          <button class="btn btn-primary" onclick="toggleScroll()" id="btnPlay">▶️ Start Scroll</button>
+          <button class="btn" onclick="resetScroll()">⏮️ Top</button>
+          <button class="btn" onclick="toggleRecording()" id="btnRecord">
+            <span class="rec-dot"></span> <span id="recLabel">Rec Video</span>
+          </button>
+          <a id="downloadLink" class="btn" style="display:none;background:#10b981;border:none;color:#fff;" download="cleanprompter-video.webm">⬇️ Save Video</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let scrolling = false;
+    let scrollRaf = null;
+    let mediaStream = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let lastTs = 0;
+
+    function syncScript() {
+      const val = document.getElementById('scriptInput').value;
+      document.getElementById('prompterTextDisplay').textContent = val;
+      const words = val.trim().split(/\s+/).filter(Boolean).length;
+      const secs = Math.max(5, Math.round((words / 130) * 60));
+      document.getElementById('wordCountBadge').textContent = `${words} words (~${secs}s)`;
+    }
+    syncScript();
+
+    function updateFont(px) {
+      document.getElementById('fontVal').textContent = px;
+      document.getElementById('prompterTextDisplay').style.fontSize = px + 'px';
+    }
+    function updateOpacity(pct) {
+      document.getElementById('opVal').textContent = pct;
+      document.getElementById('prompterBox').style.background = `rgba(8, 11, 18, ${pct / 100})`;
+    }
+    function toggleAspect() {
+      const f = document.getElementById('cameraFrame');
+      f.classList.toggle('landscape');
+      document.getElementById('btnAspect').textContent = f.classList.contains('landscape') ? '💻 16:9 Landscape' : '📱 9:16 Vertical';
+    }
+    function toggleMirrorCam() {
+      document.getElementById('camPreview').classList.toggle('unmirrored');
+    }
+    function toggleMirrorText() {
+      document.getElementById('prompterTextDisplay').classList.toggle('mirror-text');
+    }
+    function toggleCinematic() {
+      document.getElementById('camPreview').classList.toggle('cinematic');
+    }
+
+    function stepScroll(ts) {
+      if (!scrolling) return;
+      if (!lastTs) lastTs = ts;
+      const dt = (ts - lastTs) / 1000;
+      lastTs = ts;
+      const speed = parseFloat(document.getElementById('speedRange').value) || 3;
+      const rz = document.getElementById('readingZone');
+      rz.scrollTop += speed * 14 * dt;
+      if (rz.scrollTop + rz.clientHeight >= rz.scrollHeight - 2) {
+        toggleScroll(false);
+        document.getElementById('statusPill').textContent = '✅ Script Finished!';
+        return;
+      }
+      scrollRaf = requestAnimationFrame(stepScroll);
+    }
+
+    function toggleScroll(forceState) {
+      scrolling = typeof forceState === 'boolean' ? forceState : !scrolling;
+      const btn = document.getElementById('btnPlay');
+      if (scrolling) {
+        lastTs = 0;
+        btn.textContent = '⏸️ Pause';
+        document.getElementById('statusPill').textContent = '📜 Teleprompter Scrolling... Keep Eyes on Top!';
+        scrollRaf = requestAnimationFrame(stepScroll);
+      } else {
+        btn.textContent = '▶️ Start Scroll';
+        if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      }
+    }
+
+    function resetScroll() {
+      toggleScroll(false);
+      document.getElementById('readingZone').scrollTop = 0;
+      document.getElementById('statusPill').textContent = '⏮️ Reset to Top';
+    }
+
+    async function initCamera() {
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: true
+        });
+        document.getElementById('camPreview').srcObject = mediaStream;
+        document.getElementById('statusPill').textContent = '🟢 Live Camera & Mic Connected';
+      } catch (e) {
+        document.getElementById('statusPill').textContent = '💡 Demo Mode (Allow Camera to Record Video)';
+      }
+    }
+    initCamera();
+
+    async function toggleRecording() {
+      const btn = document.getElementById('btnRecord');
+      const label = document.getElementById('recLabel');
+      const dl = document.getElementById('downloadLink');
+      if (!isRecording) {
+        if (!mediaStream) await initCamera();
+        if (!mediaStream) {
+          alert('Please allow camera & microphone permissions in your browser to record video.');
+          return;
+        }
+        recordedChunks = [];
+        try {
+          mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm;codecs=vp8,opus' });
+        } catch (_) {
+          mediaRecorder = new MediaRecorder(mediaStream);
+        }
+        mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          dl.href = URL.createObjectURL(blob);
+          dl.style.display = 'inline-flex';
+          document.getElementById('statusPill').textContent = '🎉 Recording Ready! Click Save Video below.';
+        };
+        mediaRecorder.start();
+        isRecording = true;
+        btn.classList.add('rec-active');
+        label.textContent = 'Stop Rec';
+        dl.style.display = 'none';
+        if (!scrolling) toggleScroll(true);
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        btn.classList.remove('rec-active');
+        label.textContent = 'Rec Video';
+        toggleScroll(false);
+      }
+    }
+
+    async function generateScript() {
+      const topic = document.getElementById('aiTopic').value.trim();
+      const style = document.getElementById('aiStyle').value;
+      const duration = document.getElementById('aiDuration').value;
+      if (!topic) return;
+      const btn = document.getElementById('btnGenScript');
+      btn.disabled = true;
+      btn.textContent = '⏳ Generating Viral Script...';
+      try {
+        const res = await fetch('/api/store/prompter-script', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, style, duration })
+        });
+        const data = await res.json();
+        if (data && data.script) {
+          document.getElementById('scriptInput').value = data.script;
+          syncScript();
+          resetScroll();
+        }
+      } catch (_) {}
+      btn.disabled = false;
+      btn.textContent = '⚡ Generate Teleprompter Script';
+    }
+  </script>
+</body>
+</html>

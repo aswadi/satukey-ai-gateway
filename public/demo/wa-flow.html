@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WA-Flow AI CRM & Auto-CS Bot — Live Interactive Demo | Aswadi AI Venture</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Inter', sans-serif; background: #060911; color: #f1f5f9; }</style>
+</head>
+<body class="min-h-screen">
+  <header class="border-b border-white/10 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-lg">WA</div>
+        <div>
+          <h1 class="font-extrabold text-base text-white">WA-Flow AI CRM & Auto-Closing Bot v2.4</h1>
+          <p class="text-xs text-emerald-400">Multi-Agent WhatsApp AI CS • Broadcast Campaign • Auto-QRIS Invoice</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="/store/" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-lg">🛒 Beli Source Code (Rp 349rb / $99)</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Left KPI & Pipeline -->
+    <div class="lg:col-span-7 space-y-5">
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4">
+          <div class="text-xs text-slate-400">Chat Dibalas AI Hari Ini</div>
+          <div class="text-2xl font-black text-emerald-400 mt-1" id="kpiChats">1,428</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Avg. Response: 1.2 detik</div>
+        </div>
+        <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4">
+          <div class="text-xs text-slate-400">Closing QRIS Otomatis</div>
+          <div class="text-2xl font-black text-amber-400 mt-1" id="kpiSales">Rp 14.850.000</div>
+          <div class="text-[11px] text-emerald-400 mt-0.5">+38 Transaksi Lunas</div>
+        </div>
+        <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4">
+          <div class="text-xs text-slate-400">Conversion Rate AI</div>
+          <div class="text-2xl font-black text-indigo-400 mt-1">34.8%</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">24/7 Non-Stop</div>
+        </div>
+      </div>
+
+      <!-- AI Prompt & Knowledge Base Config -->
+      <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-bold text-sm text-white">🧠 Knowledge Base & Karakter AI CS Toko</h2>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">Aktif Menjawab Otomatis</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div>
+            <label class="text-slate-400 block mb-1">Nama Bisnis / Toko</label>
+            <input id="bizName" value="Berkah Elektronik & Gadget Store" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white" />
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Katalog & Harga Unggulan</label>
+            <input id="bizCatalog" value="Paket CCTV 4 Kamera Rp 1.850.000, Smart Door Lock Rp 950.000 (Gratis Pasang)" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white" />
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="simulateIncomingLead()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">⚡ Simulasikan Chat Pelanggan Masuk</button>
+          <button onclick="sendBroadcastDemo()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition">📣 Uji Broadcast Promo Anti-Banned</button>
+        </div>
+      </div>
+
+      <!-- CRM Leads Table -->
+      <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-5">
+        <h3 class="font-bold text-sm text-white mb-3">📋 Pipeline Prospek & Status Pembayaran Real-Time</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-white/10 text-slate-400">
+                <th class="pb-2">Pelanggan WA</th>
+                <th class="pb-2">Minat Produk</th>
+                <th class="pb-2">Tagihan QRIS</th>
+                <th class="pb-2">Status AI</th>
+              </tr>
+            </thead>
+            <tbody id="crmTableBody" class="divide-y divide-white/5">
+              <tr>
+                <td class="py-2.5 font-semibold text-white">+62 812-8841-9021 (Bpk. Hendra)</td>
+                <td class="py-2.5 text-slate-300">Paket CCTV 4 Kamera</td>
+                <td class="py-2.5 font-mono text-emerald-400">Rp 1.850.000</td>
+                <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">LUNAS QRIS</span></td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-semibold text-white">+62 813-7710-3319 (Ibu Rina)</td>
+                <td class="py-2.5 text-slate-300">Smart Door Lock Fingerprint</td>
+                <td class="py-2.5 font-mono text-amber-400">Rp 950.000</td>
+                <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">Menunggu Bayar</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Live WhatsApp AI Simulator -->
+    <div class="lg:col-span-5">
+      <div class="bg-slate-900 border border-white/10 rounded-2xl overflow-hidden flex flex-col h-[560px]">
+        <div class="bg-emerald-900/60 border-b border-white/10 px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-emerald-400 text-slate-950 font-bold flex items-center justify-center text-xs">AI</div>
+            <div>
+              <div class="text-xs font-bold text-white">Live Simulator WhatsApp AI CS</div>
+              <div class="text-[11px] text-emerald-300">Ketik pesan sebagai calon pembeli di bawah</div>
+            </div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-black/40 text-emerald-300 font-mono">ONLINE</span>
+        </div>
+
+        <div id="waChatBox" class="flex-1 p-4 space-y-3 overflow-y-auto text-xs bg-[#0b141a]">
+          <div class="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%]">
+            Halo kak! Selamat datang di <strong>Berkah Elektronik & Gadget Store</strong> 👋 Ada yang bisa asisten AI kami bantu hari ini?
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-950 border-t border-white/10 flex gap-2">
+          <input id="waInput" onkeydown="if(event.key==='Enter')sendWaMsg()" placeholder="Tanya harga, stok, atau minta link bayar QRIS..." class="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white" />
+          <button onclick="sendWaMsg()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs">Kirim</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    async function sendWaMsg(customText) {
+      const input = document.getElementById('waInput');
+      const text = customText || input.value.trim();
+      if (!text) return;
+      if (!customText) input.value = '';
+      const box = document.getElementById('waChatBox');
+      box.innerHTML += `<div class="flex justify-end"><div class="bg-emerald-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%]">${text}</div></div>`;
+      box.scrollTop = box.scrollHeight;
+
+      const biz = document.getElementById('bizName').value;
+      const cat = document.getElementById('bizCatalog').value;
+      const replyId = 'rep-' + Date.now();
+      box.innerHTML += `<div id="${replyId}" class="bg-slate-800 text-slate-400 p-3 rounded-2xl rounded-tl-none max-w-[85%]">Sedang mengetik balasan AI...</div>`;
+      box.scrollTop = box.scrollHeight;
+
+      try {
+        const r = await fetch('/api/store/prompter-script', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: `Balas chat WhatsApp pelanggan ini dengan ramah, singkat, persuasif sebagai CS dari ${biz} (Katalog: ${cat}), dan tawarkan link pembayaran QRIS otomatis jika mereka tertarik beli. Pesan pelanggan: "${text}"`,
+            lang: 'id',
+            durationSec: 30
+          })
+        });
+        const d = await r.json();
+        document.getElementById(replyId).innerHTML = (d.script || 'Siap kak! Stok tersedia dan gratis pasang hari ini. Mau saya buatkan invoice QRIS sekarang? 😊').replace(/\n/g, '<br>');
+        document.getElementById(replyId).className = 'bg-slate-800 text-slate-100 p-3 rounded-2xl rounded-tl-none max-w-[85%]';
+      } catch (e) {
+        document.getElementById(replyId).innerHTML = 'Siap kak! Untuk produk tersebut stoknya ready hari ini lengkap garansi resmi. Mau langsung saya terbitkan kode bayar QRIS-nya kak? 😊';
+      }
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function simulateIncomingLead() {
+      sendWaMsg('Halo kak, kalau pasang Paket CCTV 4 Kamera apakah ready hari ini? Bisa bayar pakai QRIS?');
+      const tbody = document.getElementById('crmTableBody');
+      tbody.insertAdjacentHTML('afterbegin', `<tr><td class="py-2.5 font-semibold text-white">+62 811-9024-${Math.floor(1000+Math.random()*8999)} (Lead Baru)</td><td class="py-2.5 text-slate-300">Paket CCTV 4 Kamera</td><td class="py-2.5 font-mono text-emerald-400">Rp 1.850.000</td><td class="py-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">AI Auto-Followup</span></td></tr>`);
+    }
+
+    function sendBroadcastDemo() {
+      alert('Simulasi Broadcast Anti-Banned berhasil dijadwalkan ke 250 kontak dengan jeda human-like 8-15 detik!');
+    }
+  </script>
+</body>
+</html>
