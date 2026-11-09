@@ -20,6 +20,14 @@ app.use((req, res, next) => {
   }
   next();
 });
+app.use((req, res, next) => {
+  if (/^\/downloads\/.*\.zip$/i.test(req.path)) {
+    return res.status(403).json({
+      error: 'Akses Ditolak: File Source Code (.ZIP) hanya dapat diunduh oleh Pembeli Resmi Shopee aswadi.dev menggunakan Kode Lisensi Pembeli.'
+    });
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get(['/store', '/store/'], (req, res) => {
@@ -28,6 +36,29 @@ app.get(['/store', '/store/'], (req, res) => {
 
 app.get(['/downloads', '/downloads/'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'downloads', 'index.html'));
+});
+
+const BUYER_TOKEN_MAP = {
+  'POS-9X4K-7M2P-ASWADI': '1_Aplikasi_Kasir_POS_Inventory_UMKM_Full_Source_Code.zip',
+  'KLINIK-8L3N-5V9Q-ASWADI': '2_SIMKlinik_RME_dan_Apotek_Digital_Full_Source_Code.zip',
+  'WACRM-6R2T-9K4W-ASWADI': '3_WA_Flow_AI_CRM_dan_Broadcast_Bot_Full_Source_Code.zip',
+  'PROMPTER-4H8J-2D7F-ASWADI': '4_CleanPrompter_AI_Studio_Pro_Full_Source_Code.zip',
+  'ERP5IN1-7Z9C-3B6M-ASWADI': '5_Paket_Lengkap_ERP_Kasir_Klinik_CRM_Toko_Online_Full_Source_Code.zip'
+};
+
+app.get('/api/buyer-download', (req, res) => {
+  const token = String(req.query.token || req.query.key || '').trim().toUpperCase();
+  const zipFile = BUYER_TOKEN_MAP[token];
+  if (!zipFile) {
+    return res.status(403).json({
+      error: 'Kode Lisensi Pembeli tidak valid! File ini hanya dapat diakses oleh Pembeli Resmi di Shopee aswadi.dev.'
+    });
+  }
+  const fullPath = path.join(__dirname, 'private_deliverables', zipFile);
+  if (!fs.existsSync(fullPath)) {
+    return res.status(404).json({ error: 'Paket file tidak ditemukan di server.' });
+  }
+  res.download(fullPath, zipFile);
 });
 
 // ============================================================================
