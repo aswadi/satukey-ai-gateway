@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinKas UMKM Pro v4.2 — Aplikasi Pembukuan Keuangan, Laba Rugi, Arus Kas & Invoice Otomatis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand-box">
+          <div class="brand-logo" id="sidebarLogoBadge">FK</div>
+          <div>
+            <div class="brand-title">FinKas UMKM Pro</div>
+            <div class="brand-sub">Pembukuan • Laba Rugi • Invoice</div>
+          </div>
+        </div>
+
+        <div class="nav-section-label">Menu Utama Keuangan</div>
+        <div class="nav-list">
+          <button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+            <span class="nav-left">📊 Dashboard Arus Kas</span>
+          </button>
+          <button class="nav-btn" data-tab="jurnal" onclick="switchTab('jurnal')">
+            <span class="nav-left">📒 Jurnal Kas Masuk & Keluar</span>
+          </button>
+          <button class="nav-btn" data-tab="invoice" onclick="switchTab('invoice')">
+            <span class="nav-left">🧾 Generator Invoice & WA</span>
+          </button>
+          <button class="nav-btn" data-tab="piutang" onclick="switchTab('piutang')">
+            <span class="nav-left">⏳ Hutang & Piutang</span>
+            <span class="nav-badge" id="unpaidCountBadge">0</span>
+          </button>
+          <button class="nav-btn" data-tab="labarugi" onclick="switchTab('labarugi')">
+            <span class="nav-left">📈 Laporan Laba Rugi (P&L)</span>
+          </button>
+        </div>
+
+        <div class="nav-section-label">Data & Pengaturan</div>
+        <div class="nav-list">
+          <button class="nav-btn" onclick="openProfileModal()">
+            <span class="nav-left">🏢 Profil & Logo Usaha</span>
+          </button>
+          <button class="nav-btn" onclick="exportJournalCsv()">
+            <span class="nav-left">📥 Export Excel / CSV</span>
+          </button>
+          <button class="nav-btn" onclick="backupJson()">
+            <span class="nav-left">💾 Backup Database (.JSON)</span>
+          </button>
+          <button class="nav-btn" onclick="document.getElementById('restoreFileInput').click()">
+            <span class="nav-left">📂 Restore Database (.JSON)</span>
+          </button>
+          <input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="restoreJson(event)" />
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-company-card">
+          <div class="sidebar-company-name" id="sidebarBizName">Berkah Mandiri Nusantara</div>
+          <div class="sidebar-company-meta" id="sidebarBizMeta">UMKM Retail, Kuliner & Jasa</div>
+          <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="loadSampleData(true)">🔄 Contoh UMKM</button>
+            <button class="btn btn-rose btn-sm" style="flex:1" onclick="resetBlankData()">🗑️ Reset Baru</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h1 id="pageHeaderTitle">Dashboard Ringkasan Keuangan & Arus Kas</h1>
+          <p id="pageHeaderSub">Pantau saldo kas/bank real-time, grafik arus kas bulanan, laba bersih, dan piutang pelanggan</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-emerald" onclick="openTxModal('IN')">➕ Kas Masuk</button>
+          <button class="btn btn-rose" onclick="openTxModal('OUT')">➖ Kas Keluar</button>
+          <button class="btn btn-sky" onclick="switchTab('invoice')">🧾 Buat Invoice WA</button>
+          <button class="btn btn-ghost" onclick="openTransferModal()">🔁 Mutasi Kas/Bank</button>
+        </div>
+      </header>
+
+      <div class="content-wrap">
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="tab-view active">
+          <!-- KPI SUMMARY CARDS -->
+          <div class="kpi-grid">
+            <div class="kpi-card emerald">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Pemasukan</span>
+                <span class="kpi-icon" style="background:var(--emerald-soft); color:#34d399;">📥</span>
+              </div>
+              <div class="kpi-value" id="kpiTotalIn">Rp 0</div>
+              <div class="kpi-sub" id="kpiInCount">0 transaksi kas masuk</div>
+            </div>
+
+            <div class="kpi-card rose">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Pengeluaran</span>
+                <span class="kpi-icon" style="background:var(--rose-soft); color:#fda4af;">📤</span>
+              </div>
+              <div class="kpi-value" id="kpiTotalOut">Rp 0</div>
+              <div class="kpi-sub" id="kpiOutCount">0 transaksi kas keluar</div>
+            </div>
+
+            <div class="kpi-card sky">
+              <div class="kpi-top">
+                <span class="kpi-label">Laba Bersih Usaha</span>
+                <span class="kpi-icon" style="background:var(--sky-soft); color:#38bdf8;">💎</span>
+              </div>
+              <div class="kpi-value" id="kpiNetProfit">Rp 0</div>
+              <div class="kpi-sub" id="kpiProfitMargin">Margin Bersih: 0%</div>
+            </div>
+
+            <div class="kpi-card amber">
+              <div class="kpi-top">
+                <span class="kpi-label">Piutang Belum Dibayar</span>
+                <span class="kpi-icon" style="background:var(--amber-soft); color:#fcd34d;">⏳</span>
+              </div>
+              <div class="kpi-value" id="kpiReceivables">Rp 0</div>
+              <div class="kpi-sub" id="kpiPayablesInfo">Hutang Usaha: Rp 0</div>
+            </div>
+          </div>
+
+          <!-- MULTI-REKENING KAS & BANK -->
+          <div class="wallet-grid" id="walletCardsGrid"></div>
+
+          <!-- INTERACTIVE CHART & EXPENSE BREAKDOWN -->
+          <div class="dashboard-row">
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Grafik Arus Kas & Tren Laba Bersih Bulanan</div>
+                  <div class="panel-sub">Perbandingan Pemasukan vs Pengeluaran & Laba Bersih 6 Bulan Terakhir</div>
+                </div>
+                <div class="chart-legend">
+                  <span><i class="legend-dot" style="background:#10b981"></i>Pemasukan</span>
+                  <span><i class="legend-dot" style="background:#f43f5e"></i>Pengeluaran</span>
+                  <span><i class="legend-dot" style="background:#38bdf8"></i>Laba Bersih</span>
+                </div>
+              </div>
+              <div class="chart-box">
+                <canvas id="cashflowCanvas"></canvas>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Komposisi Pengeluaran</div>
+                  <div class="panel-sub">Distribusi HPP & biaya operasional terbesar</div>
+                </div>
+              </div>
+              <div class="cat-list" id="expenseCategoryList"></div>
+            </div>
+          </div>
+
+          <!-- RECENT TRANSACTIONS & UPCOMING DUE PIUTANG -->
+          <div class="dashboard-row">
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Transaksi Jurnal Kas Terbaru</div>
+                  <div class="panel-sub">8 mutasi kas masuk & keluar terakhir</div>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="switchTab('jurnal')">Lihat Semua Jurnal →</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Keterangan & Kategori</th>
+                      <th>Rekening</th>
+                      <th>Tipe</th>
+                      <th style="text-align:right">Nominal</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentTxBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Pengingat Jatuh Tempo</div>
+                  <div class="panel-sub">Piutang pelanggan & hutang supplier aktif</div>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="switchTab('piutang')">Kelola →</button>
+              </div>
+              <div id="upcomingDueList" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 2: JURNAL KAS MASUK & KELUAR ==================== -->
+        <section id="tab-jurnal" class="tab-view">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Buku Jurnal Kas Masuk & Kas Keluar</div>
+                <div class="panel-sub">Pencatatan pembukuan harian lengkap dengan filter periode, kategori akun, dan pencarian instan</div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-emerald btn-sm" onclick="openTxModal('IN')">➕ Tambah Kas Masuk</button>
+                <button class="btn btn-rose btn-sm" onclick="openTxModal('OUT')">➖ Tambah Kas Keluar</button>
+                <button class="btn btn-ghost btn-sm" onclick="exportJournalCsv()">📥 Export CSV / Excel</button>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <input type="text" id="filterSearch" class="input" style="max-width:250px" placeholder="🔍 Cari keterangan / referensi..." oninput="renderJournalTable()" />
+              <select id="filterType" class="input" style="max-width:155px" onchange="renderJournalTable()">
+                <option value="ALL">Semua Tipe</option>
+                <option value="IN">Kas Masuk (+)</option>
+                <option value="OUT">Kas Keluar (-)</option>
+              </select>
+              <select id="filterAccount" class="input" style="max-width:170px" onchange="renderJournalTable()">
+                <option value="ALL">Semua Rekening</option>
+                <option value="kas">Kas Tunai</option>
+                <option value="bca">Bank BCA</option>
+                <option value="mandiri">Bank Mandiri</option>
+                <option value="qris">Saldo QRIS</option>
+              </select>
+              <select id="filterCategory" class="input" style="max-width:195px" onchange="renderJournalTable()">
+                <option value="ALL">Semua Kategori Akun</option>
+                <option value="Penjualan Produk/Jasa">Penjualan Produk/Jasa</option>
+                <option value="Pelunasan Piutang">Pelunasan Piutang</option>
+                <option value="Pendapatan Lainnya">Pendapatan Lainnya</option>
+                <option value="HPP Bahan Baku">HPP Bahan Baku</option>
+                <option value="Gaji & Komisi">Gaji & Komisi</option>
+                <option value="Sewa Tempat">Sewa Tempat</option>
+                <option value="Operasional & Utilitas">Operasional & Utilitas</option>
+                <option value="Marketing & Iklan">Marketing & Iklan</option>
+                <option value="Pajak & Administrasi">Pajak & Administrasi</option>
+              </select>
+              <input type="date" id="filterDateFrom" class="input" style="max-width:152px" onchange="renderJournalTable()" />
+              <input type="date" id="filterDateTo" class="input" style="max-width:152px" onchange="renderJournalTable()" />
+              <button class="btn btn-ghost btn-sm" onclick="resetJournalFilters()">Reset Filter</button>
+            </div>
+
+            <div id="journalFilterSummary" style="margin-bottom:12px; font-size:0.8rem; color:var(--text-muted); font-weight:700;"></div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>No. Ref</th>
+                    <th>Kategori Akun</th>
+                    <th>Deskripsi Transaksi</th>
+                    <th>Rekening</th>
+                    <th>Tipe</th>
+                    <th style="text-align:right">Nominal (Rp)</th>
+                    <th style="text-align:center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="journalTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 3: GENERATOR INVOICE & KWITANSI WA ==================== -->
+        <section id="tab-invoice" class="tab-view">
+          <div class="invoice-layout">
+            <!-- Left: Editor Form & Saved Invoices -->
+            <div class="panel no-print">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Generator Invoice, Penawaran & Kwitansi Digital</div>
+                  <div class="panel-sub">Cetak PDF rapi atau kirim tagihan otomatis ke WhatsApp pelanggan sekali klik</div>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="newInvoiceForm()">📄 Dokumen Baru</button>
+              </div>
+
+              <div class="form-grid" style="margin-bottom:12px;">
+                <div class="field">
+                  <label>Jenis Dokumen</label>
+                  <select id="invDocType" class="input" onchange="updateInvoicePreview()">
+                    <option value="INVOICE TAGIHAN">INVOICE TAGIHAN</option>
+                    <option value="KWITANSI PEMBAYARAN">KWITANSI LUNAS</option>
+                    <option value="PENAWARAN HARGA">PENAWARAN (QUOTATION)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Nomor Dokumen</label>
+                  <input type="text" id="invNumber" class="input" oninput="updateInvoicePreview()" />
+                </div>
+                <div class="field">
+                  <label>Tanggal Terbit</label>
+                  <input type="date" id="invDate" class="input" onchange="updateInvoicePreview()" />
+                </div>
+                <div class="field">
+                  <label>Jatuh Tempo</label>
+                  <input type="date" id="invDue" class="input" onchange="updateInvoicePreview()" />
+                </div>
+                <div class="field">
+                  <label>Nama Pelanggan / Instansi</label>
+                  <input type="text" id="invClientName" class="input" placeholder="Contoh: CV Sinar Jaya Abadi" oninput="updateInvoicePreview()" />
+                </div>
+                <div class="field">
+                  <label>No. WhatsApp Pelanggan (628...)</label>
+                  <input type="text" id="invClientWa" class="input" placeholder="Contoh: 6281234567890" oninput="updateInvoicePreview()" />
+                </div>
+              </div>
+
+              <div class="field" style="margin-bottom:12px;">
+                <label>Alamat Pelanggan / Catatan Pengiriman</label>
+                <input type="text" id="invClientAddr" class="input" placeholder="Jl. Sudirman No. 45, Jakarta Selatan" oninput="updateInvoicePreview()" />
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:0.8rem; font-weight:800;">Rincian Item Barang / Jasa</span>
+                <button class="btn btn-sky btn-sm" onclick="addInvoiceItemRow()">➕ Tambah Baris</button>
+              </div>
+              <div id="invItemsContainer" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+
+              <div class="form-grid" style="margin-bottom:14px;">
+                <div class="field">
+                  <label>Diskon Nominal (Rp)</label>
+                  <input type="number" id="invDiscount" class="input" value="0" min="0" oninput="updateInvoicePreview()" />
+                </div>
+                <div class="field">
+                  <label>Pajak PPN (%)</label>
+                  <select id="invTaxRate" class="input" onchange="updateInvoicePreview()">
+                    <option value="0">Tanpa PPN (0%)</option>
+                    <option value="11">PPN 11%</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Status Pembayaran</label>
+                  <select id="invStatus" class="input" onchange="updateInvoicePreview()">
+                    <option value="BELUM LUNAS">BELUM LUNAS</option>
+                    <option value="LUNAS">LUNAS</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field" style="margin-bottom:14px;">
+                <label>Catatan Pembayaran / Rekening Tujuan</label>
+                <input type="text" id="invNote" class="input" oninput="updateInvoicePreview()" />
+              </div>
+
+              <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:8px; border-top:1px solid var(--border);">
+                <button class="btn btn-emerald" onclick="saveCurrentInvoice()">💾 Simpan Invoice</button>
+                <button class="btn btn-sky" onclick="window.print()">🖨️ Cetak PDF / Print</button>
+                <button class="btn btn-wa" onclick="sendInvoiceWhatsApp()">📲 Kirim Tagihan via WhatsApp</button>
+                <button class="btn btn-amber" onclick="markInvoicePaidToJournal()">✅ Tandai Lunas → Masuk Kas</button>
+              </div>
+
+              <!-- Saved Invoice History -->
+              <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+                <div style="font-size:0.84rem; font-weight:800; margin-bottom:10px;">Arsip Invoice & Kwitansi Tersimpan</div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>No. Dokumen</th>
+                        <th>Pelanggan</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="savedInvoicesBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Crisp Printable A4 Preview -->
+            <div class="paper-preview" id="invoicePaperArea"></div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 4: MANAJEMEN HUTANG & PIUTANG ==================== -->
+        <section id="tab-piutang" class="tab-view">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Manajemen Piutang Pelanggan & Hutang Supplier</div>
+                <div class="panel-sub">Pantau tagihan jatuh tempo, kirim pengingat WA sopan, dan catat pelunasan otomatis ke Jurnal Kas</div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-amber btn-sm" onclick="openDebtModal('PIUTANG')">➕ Catat Piutang Pelanggan</button>
+                <button class="btn btn-rose btn-sm" onclick="openDebtModal('HUTANG')">➕ Catat Hutang Supplier</button>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <select id="debtFilterType" class="input" style="max-width:200px" onchange="renderDebtsTable()">
+                <option value="ALL">Semua (Piutang & Hutang)</option>
+                <option value="PIUTANG">Piutang Pelanggan (Tagihan Masuk)</option>
+                <option value="HUTANG">Hutang Supplier (Kewajiban Keluar)</option>
+              </select>
+              <select id="debtFilterStatus" class="input" style="max-width:180px" onchange="renderDebtsTable()">
+                <option value="ALL">Semua Status</option>
+                <option value="UNPAID">Belum Lunas</option>
+                <option value="PAID">Sudah Lunas</option>
+              </select>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tipe</th>
+                    <th>Nama Pelanggan / Supplier</th>
+                    <th>Keterangan</th>
+                    <th>Jatuh Tempo</th>
+                    <th style="text-align:right">Nominal</th>
+                    <th>Status</th>
+                    <th style="text-align:center">Aksi Cepat</th>
+                  </tr>
+                </thead>
+                <tbody id="debtsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 5: LAPORAN LABA RUGI (P&L) ==================== -->
+        <section id="tab-labarugi" class="tab-view">
+          <div class="panel no-print" style="margin-bottom:18px;">
+            <div class="panel-header" style="margin-bottom:0;">
+              <div>
+                <div class="panel-title">Filter Periode Laporan Laba Rugi (Profit & Loss)</div>
+                <div class="panel-sub">Laporan otomatis siap cetak PDF dan ditandatangani pemilik usaha / akuntan</div>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <select id="pnlMonthFilter" class="input" style="width:190px" onchange="renderProfitLossReport()">
+                  <option value="ALL">Semua Periode (Akumulasi)</option>
+                  <option value="2026-11">November 2026</option>
+                  <option value="2026-10">Oktober 2026</option>
+                  <option value="2026-09">September 2026</option>
+                  <option value="2026-08">Agustus 2026</option>
+                </select>
+                <button class="btn btn-sky" onclick="window.print()">🖨️ Cetak Laporan Laba Rugi (PDF)</button>
+                <button class="btn btn-emerald" onclick="exportPnlCsv()">📥 Export Laba Rugi (.CSV)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Printable Formal Profit & Loss Statement -->
+          <div class="paper-preview" id="pnlPaperArea"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: TAMBAH / EDIT TRANSAKSI JURNAL -->
+  <div class="modal-backdrop" id="txModal">
+    <div class="modal-card">
+      <div class="panel-header">
+        <div class="panel-title" id="txModalTitle">Tambah Transaksi Jurnal Kas</div>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('txModal')">✕ Tutup</button>
+      </div>
+      <input type="hidden" id="txEditId" />
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="field">
+          <label>Tipe Arus Kas</label>
+          <select id="txType" class="input" onchange="syncTxCategoryOptions()">
+            <option value="IN">Kas Masuk (Pemasukan +)</option>
+            <option value="OUT">Kas Keluar (Pengeluaran -)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tanggal Transaksi</label>
+          <input type="date" id="txDate" class="input" />
+        </div>
+        <div class="field">
+          <label>Kategori Akun</label>
+          <select id="txCategory" class="input"></select>
+        </div>
+        <div class="field">
+          <label>Rekening Kas / Bank</label>
+          <select id="txAccount" class="input">
+            <option value="kas">Kas Tunai Laci</option>
+            <option value="bca">Bank BCA</option>
+            <option value="mandiri">Bank Mandiri</option>
+            <option value="qris">Saldo QRIS / E-Wallet</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Nominal Rupiah (Rp)</label>
+          <input type="number" id="txAmount" class="input" placeholder="Contoh: 450000" min="1" />
+        </div>
+        <div class="field">
+          <label>No. Referensi / Nota</label>
+          <input type="text" id="txRef" class="input" placeholder="Contoh: TRX-001" />
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Keterangan Lengkap Transaksi</label>
+        <input type="text" id="txDesc" class="input" placeholder="Contoh: Penjualan Paket Katering Harian 30 Pax" />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-ghost" onclick="closeModal('txModal')">Batal</button>
+        <button class="btn btn-emerald" onclick="saveTransaction()">💾 Simpan ke Jurnal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: MUTASI ANTAR REKENING KAS/BANK -->
+  <div class="modal-backdrop" id="transferModal">
+    <div class="modal-card" style="max-width:480px;">
+      <div class="panel-header">
+        <div class="panel-title">🔁 Mutasi / Pindah Saldo Antar Rekening</div>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('transferModal')">✕</button>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="field">
+          <label>Dari Rekening Asal</label>
+          <select id="trfFrom" class="input">
+            <option value="qris">Saldo QRIS / E-Wallet</option>
+            <option value="kas">Kas Tunai Laci</option>
+            <option value="bca">Bank BCA</option>
+            <option value="mandiri">Bank Mandiri</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Ke Rekening Tujuan</label>
+          <select id="trfTo" class="input">
+            <option value="bca">Bank BCA</option>
+            <option value="mandiri">Bank Mandiri</option>
+            <option value="kas">Kas Tunai Laci</option>
+            <option value="qris">Saldo QRIS / E-Wallet</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:14px;">
+        <div class="field">
+          <label>Tanggal Mutasi</label>
+          <input type="date" id="trfDate" class="input" />
+        </div>
+        <div class="field">
+          <label>Nominal Pindah Buku (Rp)</label>
+          <input type="number" id="trfAmount" class="input" placeholder="Contoh: 1500000" min="1" />
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Catatan Mutasi</label>
+        <input type="text" id="trfNote" class="input" value="Pencairan Settlement QRIS / Setor Tunai ke Bank" />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-ghost" onclick="closeModal('transferModal')">Batal</button>
+        <button class="btn btn-sky" onclick="executeAccountTransfer()">🔁 Proses Mutasi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: CATAT HUTANG / PIUTANG BARU -->
+  <div class="modal-backdrop" id="debtModal">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="panel-header">
+        <div class="panel-title" id="debtModalTitle">Catat Piutang / Hutang Baru</div>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('debtModal')">✕</button>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="field">
+          <label>Kategori</label>
+          <select id="debtType" class="input">
+            <option value="PIUTANG">Piutang Pelanggan (Uang Akan Masuk)</option>
+            <option value="HUTANG">Hutang Supplier (Kewajiban Bayar)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tanggal Jatuh Tempo</label>
+          <input type="date" id="debtDue" class="input" />
+        </div>
+        <div class="field">
+          <label>Nama Pelanggan / Supplier</label>
+          <input type="text" id="debtParty" class="input" placeholder="Contoh: Toko Kue Lestari" />
+        </div>
+        <div class="field">
+          <label>Nomor WhatsApp (628...)</label>
+          <input type="text" id="debtWa" class="input" placeholder="6281298765432" />
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:14px;">
+        <div class="field">
+          <label>Nominal Tagihan (Rp)</label>
+          <input type="number" id="debtAmount" class="input" placeholder="Contoh: 1250000" />
+        </div>
+        <div class="field">
+          <label>Rekening Pelunasan Default</label>
+          <select id="debtAccount" class="input">
+            <option value="bca">Bank BCA</option>
+            <option value="mandiri">Bank Mandiri</option>
+            <option value="kas">Kas Tunai Laci</option>
+            <option value="qris">Saldo QRIS</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Keterangan Barang / Invoice</label>
+        <input type="text" id="debtDesc" class="input" placeholder="Contoh: Pesanan 50 Box Hampers Korporat" />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-ghost" onclick="closeModal('debtModal')">Batal</button>
+        <button class="btn btn-emerald" onclick="saveDebtRecord()">💾 Simpan Catatan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: PENGATURAN PROFIL & LOGO USAHA -->
+  <div class="modal-backdrop" id="profileModal">
+    <div class="modal-card">
+      <div class="panel-header">
+        <div class="panel-title">🏢 Pengaturan Identitas Usaha (Kop Invoice & Laporan)</div>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('profileModal')">✕</button>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="field">
+          <label>Nama Usaha / Perusahaan</label>
+          <input type="text" id="bizNameInput" class="input" />
+        </div>
+        <div class="field">
+          <label>Inisial Logo (2 Huruf)</label>
+          <input type="text" id="bizInitialsInput" class="input" maxlength="3" />
+        </div>
+        <div class="field">
+          <label>Bidang Usaha / Tagline</label>
+          <input type="text" id="bizTaglineInput" class="input" />
+        </div>
+        <div class="field">
+          <label>Nama Pemilik / Direktur (Tanda Tangan)</label>
+          <input type="text" id="bizOwnerInput" class="input" />
+        </div>
+        <div class="field">
+          <label>No. Telepon / WhatsApp Bisnis</label>
+          <input type="text" id="bizPhoneInput" class="input" />
+        </div>
+        <div class="field">
+          <label>Kota Tempat Tanda Tangan</label>
+          <input type="text" id="bizCityInput" class="input" />
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Alamat Lengkap Usaha</label>
+        <input type="text" id="bizAddrInput" class="input" />
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Info Rekening Pembayaran Invoice (Muncul di Invoice & WA)</label>
+        <input type="text" id="bizBankInfoInput" class="input" />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-ghost" onclick="closeModal('profileModal')">Batal</button>
+        <button class="btn btn-emerald" onclick="saveBusinessProfile()">💾 Simpan Identitas Usaha</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastEl" class="toast">Berhasil disimpan!</div>
+  <script src="assets/app.js"></script>
+</body>
+</html>
