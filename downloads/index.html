@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Klaim Source Code Khusus Pembeli Resmi — aswadi.dev</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #070b14; color: #f8fafc; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+  <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-black text-slate-950 text-lg shadow">🔒</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-base text-white">aswadi.dev — Portal Klaim Pembeli Resmi</h1>
+            <span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">AES-256 ENCRYPTED VAULT</span>
+          </div>
+          <p class="text-xs text-slate-400">File Full Source Code (.ZIP) Terkunci & Hanya Dapat Diakses Menggunakan Kode Lisensi Pembeli Shopee</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="../public/store/index.html" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition">🛒 Lihat Katalog & Live Demo</a>
+        <a href="https://shopee.co.id/aswadi.dev" target="_blank" class="px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-xs font-bold text-white transition">Beli di Shopee Official</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-10 flex-1 w-full">
+    <!-- Security Notice & Token Input Gate -->
+    <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/60 border border-slate-800 rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="max-w-xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold mb-3">
+            🔐 PROTEKSI LISENSI PEMBELI RESMI SHOPEE
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Masukkan Kode Lisensi Pembeli Anda</h2>
+          <p class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed">
+            Demi keamanan lisensi, seluruh file <strong>Full Source Code (.ZIP)</strong> dienkripsi dengan algoritma <strong>AES-256-GCM</strong> dan hanya bisa diunduh oleh pembeli yang telah menyelesaikan pesanan di toko resmi Shopee <strong>aswadi.dev</strong>. Kode Lisensi dikirimkan otomatis oleh sistem ke <strong>Chat Shopee</strong> Anda setelah pembayaran terkonfirmasi.
+          </p>
+        </div>
+
+        <div class="w-full md:w-96 bg-slate-950/90 border border-slate-800 rounded-2xl p-5">
+          <label class="block text-xs font-bold text-slate-300 mb-2">KODE LISENSI / TOKEN PESANAN SHOPEE:</label>
+          <input id="licenseInput" type="text" placeholder="Contoh: POS-XXXX-XXXX-ASWADI"
+            class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-sm uppercase focus:outline-none focus:border-emerald-500 mb-3" />
+          <button onclick="verifyAndUnlock()"
+            class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm transition shadow-lg shadow-emerald-600/25">
+            🔓 Verifikasi & Buka Kunci Download
+          </button>
+          <div id="statusMsg" class="mt-3 text-xs font-semibold hidden"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Vault List -->
+    <div id="vaultGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+  </main>
+
+  <footer class="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
+    © 2026 <strong>aswadi.dev Official Software Store</strong> • Dilindungi Enkripsi Lisensi AES-256-GCM Khusus Pembeli Resmi
+  </footer>
+
+  <script>
+    const VAULT_ITEMS = [
+  {
+    "id": "pos",
+    "shopeeItemId": "50871378863",
+    "title": "KasirPintar POS & Inventory UMKM Pro v3.2",
+    "badge": "POS KASIR & INVENTORY",
+    "zipName": "1_Aplikasi_Kasir_POS_Inventory_UMKM_Full_Source_Code.zip",
+    "vaultFile": "vault_1_pos.enc",
+    "sizeBytes": 10223,
+    "tokenHash": "c2ad20d50dc4d019806879052b328cedf94a9b38bf9495ccfb0dbe7482226f16",
+    "demoUrl": "../public/demo/pos-kasir.html",
+    "desc": "Full Source Code Aplikasi Kasir POS, Cetak Struk Thermal 58mm/80mm, Manajemen Stok HPP, Laba Rugi & Export CSV/Excel."
+  },
+  {
+    "id": "klinik",
+    "shopeeItemId": "57371352581",
+    "title": "SIMKlinik Pratama RME SOAP & Apotek Digital v4.0",
+    "badge": "SIMKLINIK & APOTEK",
+    "zipName": "2_SIMKlinik_RME_dan_Apotek_Digital_Full_Source_Code.zip",
+    "vaultFile": "vault_2_klinik.enc",
+    "sizeBytes": 6177,
+    "tokenHash": "578034f76ab796e2fbf1ebe0b9c352f0f53a0b2d4df73096671db3736abc99f9",
+    "demoUrl": "../public/demo/klinik-apotek.html",
+    "desc": "Full Source Code Rekam Medis Elektronik (RME) Standar SOAP + ICD-10, Antrean Poli, Stok Obat Apotek & Cetak Resep/Kwitansi."
+  },
+  {
+    "id": "wa",
+    "shopeeItemId": "42036625379",
+    "title": "WA-Flow AI CRM, Funnel Kanban & Broadcast Bot v3.5",
+    "badge": "CRM & AI AUTO-REPLY",
+    "zipName": "3_WA_Flow_AI_CRM_dan_Broadcast_Bot_Full_Source_Code.zip",
+    "vaultFile": "vault_3_wa.enc",
+    "sizeBytes": 5454,
+    "tokenHash": "e5860554ad6c54dd0cffcaf5642c5a78aab2a81ed86ad51c21670531929d103b",
+    "demoUrl": "../public/demo/wa-ai-crm.html",
+    "desc": "Full Source Code CRM Pipeline Kanban, Broadcast Kampanye Anti-Banned, Variabel Nama Dinamis & Rule Engine Bot Auto-Reply CS."
+  },
+  {
+    "id": "prompter",
+    "shopeeItemId": "54871357782",
+    "title": "CleanPrompter AI Studio Pro 4K",
+    "badge": "CREATOR AI STUDIO",
+    "zipName": "4_CleanPrompter_AI_Studio_Pro_Full_Source_Code.zip",
+    "vaultFile": "vault_4_prompter.enc",
+    "sizeBytes": 8177,
+    "tokenHash": "47a8a49f6143493f2f328502e4d39769aa0aa1870789ccb1fb00dbb83d733c71",
+    "demoUrl": "../public/prompter/index.html",
+    "desc": "Full Source Code Teleprompter Kamera Layar Jernih, AI Script Writer, Perekam Video Langsung & Voice Scroll."
+  },
+  {
+    "id": "erp",
+    "shopeeItemId": "47271436707",
+    "title": "Paket Lengkap 5-in-1 Enterprise Suite (POS + SIMKlinik + WA CRM + AI Studio + Toko Online)",
+    "badge": "BUNDLING 5-IN-1 ERP",
+    "zipName": "5_Paket_Lengkap_ERP_Kasir_Klinik_CRM_Toko_Online_Full_Source_Code.zip",
+    "vaultFile": "vault_5_erp.enc",
+    "sizeBytes": 39843,
+    "tokenHash": "2702063d7badafd8f5d8dfc251716fccbd1d4f26a95d91ba72fbcdcfd4fcf4f0",
+    "demoUrl": "../public/store/index.html",
+    "desc": "Full Source Code Bundling Lengkap 5 Aplikasi sekaligus (Kasir POS + SIMKlinik RME + WA CRM + CleanPrompter + Toko Online)."
+  },
+  {
+    "id": "finance",
+    "shopeeItemId": "41036690217",
+    "title": "FinKas UMKM Pro v4.2 — Aplikasi Pembukuan Keuangan, Laba Rugi, Arus Kas & Invoice Otomatis",
+    "badge": "PEMBUKUAN & INVOICE WA",
+    "zipName": "6_Aplikasi_Pembukuan_Keuangan_UMKM_Laba_Rugi_Invoice_Full_Source_Code.zip",
+    "vaultFile": "vault_6_finance.enc",
+    "sizeBytes": 30968,
+    "tokenHash": "d0debff854b82767f75371997afa8ca41a3ccf1277127b795afc6053c9931948",
+    "demoUrl": "../public/demo/pembukuan-umkm.html",
+    "desc": "Full Source Code Pembukuan Arus Kas Multi-Rekening, Grafik Bulanan, Generator Invoice/Kwitansi WA, Hutang Piutang & Laporan Laba Rugi Siap Cetak PDF."
+  },
+  {
+    "id": "kost",
+    "shopeeItemId": "52771570408",
+    "title": "KostPintar Pro v4.5 — Aplikasi Manajemen Kost & Kontrakan, Pengingat Tagihan WA & Kwitansi Digital",
+    "badge": "MANAJEMEN KOST & WA",
+    "zipName": "7_Aplikasi_Manajemen_Kost_Kontrakan_Pro.zip",
+    "vaultFile": "vault_7_kost.enc",
+    "sizeBytes": 28334,
+    "tokenHash": "461ed37a2d0aff2f919de5e98cc0ecede1ebf255cf477c19ec9e6e72c2d838b1",
+    "demoUrl": "../public/demo/manajemen-kost.html",
+    "desc": "Full Source Code Peta Kamar Visual, Database Penyewa + KTP, Tagihan Listrik/Air + Denda Otomatis, 1-Klik Pengingat WA & Cetak Kwitansi Resmi PDF/Thermal."
+  }
+];
+    const MASTER_ERP_HASH = "2702063d7badafd8f5d8dfc251716fccbd1d4f26a95d91ba72fbcdcfd4fcf4f0";
+    let activeToken = "";
+    let activeTokenHash = "";
+
+    async function sha256Hex(str) {
+      const buf = new TextEncoder().encode(str);
+      const digest = await crypto.subtle.digest("SHA-256", buf);
+      return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function isItemUnlocked(item) {
+      if (!activeTokenHash) return false;
+      if (activeTokenHash === item.tokenHash) return true;
+      if (activeTokenHash === MASTER_ERP_HASH && item.id === "erp") return true;
+      return false;
+    }
+
+    function renderVaults() {
+      const grid = document.getElementById("vaultGrid");
+      grid.innerHTML = VAULT_ITEMS.map(item => {
+        const unlocked = isItemUnlocked(item);
+        return `
+          <div class="bg-slate-900/95 border ${unlocked ? 'border-emerald-500/60 shadow-lg shadow-emerald-500/10' : 'border-slate-800 opacity-85'} rounded-2xl p-6 flex flex-col justify-between transition">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="px-2.5 py-1 text-[11px] font-extrabold rounded-lg bg-slate-800 text-slate-300 border border-slate-700">${item.badge}</span>
+                ${unlocked
+                  ? '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">🔓 TERBUKA ( SIAP UNDUH )</span>'
+                  : '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30">🔒 TERKUNCI (KHUSUS PEMBELI)</span>'}
+              </div>
+              <h3 class="text-base font-extrabold text-white">${item.title}</h3>
+              <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">${item.desc}</p>
+            </div>
+            <div class="mt-5 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+              ${unlocked
+                ? `<button onclick="downloadDecrypted('${item.id}')" id="btn-${item.id}" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition shadow-lg">
+                     📥 Download Full Source Code (.ZIP)
+                   </button>`
+                : `<button onclick="document.getElementById('licenseInput').focus()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-400 font-bold text-xs cursor-not-allowed">
+                     🔒 Masukkan Kode Lisensi Pembeli
+                   </button>`}
+              <a href="${item.demoUrl}" target="_blank" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition">
+                🖥️ Cek Live Demo
+              </a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function verifyAndUnlock(autoToken) {
+      const inputEl = document.getElementById("licenseInput");
+      const statusEl = document.getElementById("statusMsg");
+      const raw = (autoToken || inputEl.value || "").trim().toUpperCase();
+      if (!raw) {
+        statusEl.className = "mt-3 text-xs font-semibold text-amber-400 block";
+        statusEl.textContent = "⚠️ Silakan masukkan Kode Lisensi Pembeli dari Chat Shopee Anda.";
+        return;
+      }
+      inputEl.value = raw;
+      const h = await sha256Hex("VERIFY_" + raw);
+      const matched = VAULT_ITEMS.find(x => x.tokenHash === h);
+      if (!matched) {
+        activeToken = "";
+        activeTokenHash = "";
+        statusEl.className = "mt-3 text-xs font-semibold text-rose-400 block";
+        statusEl.textContent = "❌ Kode Lisensi tidak valid! File ini hanya dapat diakses oleh Pembeli Resmi di Shopee aswadi.dev.";
+        renderVaults();
+        return;
+      }
+      activeToken = raw;
+      activeTokenHash = h;
+      statusEl.className = "mt-3 text-xs font-semibold text-emerald-400 block";
+      statusEl.textContent = "✅ Kode Lisensi Terverifikasi! Paket '" + matched.title + "' telah dibuka dan siap diunduh.";
+      renderVaults();
+    }
+
+    async function downloadDecrypted(itemId) {
+      const item = VAULT_ITEMS.find(x => x.id === itemId);
+      if (!item || !isItemUnlocked(item)) {
+        alert("Akses Ditolak! Masukkan Kode Lisensi Pembeli yang valid terlebih dahulu.");
+        return;
+      }
+      const btn = document.getElementById("btn-" + itemId);
+      const origText = btn ? btn.innerHTML : "";
+      try {
+        if (btn) btn.innerHTML = "⏳ Mendekripsi & Mengunduh...";
+        const res = await fetch("../public/downloads/" + item.vaultFile);
+        if (!res.ok) throw new Error("Gagal mengambil brankas terenkripsi");
+        const encBytes = new Uint8Array(await res.arrayBuffer());
+        const salt = encBytes.slice(0, 16);
+        const iv = encBytes.slice(16, 28);
+        const ciphertextAndTag = encBytes.slice(28);
+
+        const baseKey = await crypto.subtle.importKey(
+          "raw",
+          new TextEncoder().encode(activeToken),
+          "PBKDF2",
+          false,
+          ["deriveKey"]
+        );
+        const aesKey = await crypto.subtle.deriveKey(
+          { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
+          baseKey,
+          { name: "AES-GCM", length: 256 },
+          false,
+          ["decrypt"]
+        );
+        const plainBuf = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv },
+          aesKey,
+          ciphertextAndTag
+        );
+
+        const blob = new Blob([plainBuf], { type: "application/zip" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = item.zipName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        if (btn) btn.innerHTML = "✅ Berhasil Diunduh!";
+        setTimeout(() => { if (btn) btn.innerHTML = origText; }, 3000);
+      } catch (err) {
+        alert("Gagal mendekripsi file: pastikan Kode Lisensi sesuai dengan produk yang dibeli.");
+        if (btn) btn.innerHTML = origText;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderVaults();
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get("token") || params.get("key");
+      if (urlToken) {
+        verifyAndUnlock(urlToken);
+      }
+    });
+  </script>
+</body>
+</html>

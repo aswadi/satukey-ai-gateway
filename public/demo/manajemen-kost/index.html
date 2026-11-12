@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KostPintar Pro v4.5 — Aplikasi Manajemen Kost, Kontrakan, Pengingat WA & Kwitansi Digital</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand-box">
+          <div class="brand-logo">KP</div>
+          <div>
+            <div class="brand-title" id="sidebarPropertyName">Kost Graha Emerald</div>
+            <div class="brand-sub">KostPintar Pro v4.5 • Full Source</div>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+            <span>01 • Peta Kamar & Dashboard</span>
+            <span id="badgeTotalRooms" style="font-size:11px;color:#34d399;">12</span>
+          </button>
+          <button class="nav-btn" data-tab="penyewa" onclick="switchTab('penyewa')">
+            <span>02 • Data Penyewa & KTP</span>
+          </button>
+          <button class="nav-btn" data-tab="tagihan" onclick="switchTab('tagihan')">
+            <span>03 • Tagihan & Pengingat WA</span>
+            <span class="nav-badge" id="badgeUnpaidCount">3</span>
+          </button>
+          <button class="nav-btn" data-tab="kwitansi" onclick="switchTab('kwitansi')">
+            <span>04 • Cetak Kwitansi Resmi / PDF</span>
+          </button>
+          <button class="nav-btn" data-tab="operasional" onclick="switchTab('operasional')">
+            <span>05 • Pengeluaran & Laba Bersih</span>
+          </button>
+          <button class="nav-btn" data-tab="pengaturan" onclick="switchTab('pengaturan')">
+            <span>06 • Pengaturan, CSV & Backup</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:4px;">Status Penyimpanan Lokal</div>
+        <div id="syncStatusText" style="color:#34d399;font-weight:600;">Aktif • Tersimpan Otomatis</div>
+        <div style="margin-top:8px;">Lisensi Resmi Sekali Bayar • Tanpa Biaya Bulanan</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-area">
+      <header class="topbar">
+        <div>
+          <h1 id="headerPropertyTitle">Kost & Kontrakan Graha Emerald Residence</h1>
+          <div class="topbar-sub" id="headerPropertySub">Jl. Melati Raya No. 28, Setiabudi • Manajemen Kamar, Tagihan Listrik/Air, Pengingat WA & Kwitansi PDF</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" onclick="openRoomModal()">+ Tambah / Edit Kamar</button>
+          <button class="btn btn-cyan" onclick="openTenantModal()">+ Penyewa Baru (KTP)</button>
+          <button class="btn btn-emerald" onclick="generateMonthlyBills()">⚡ Buat Tagihan Bulan Ini</button>
+        </div>
+      </header>
+
+      <!-- TAB 1: DASHBOARD & VISUAL ROOM GRID -->
+      <section id="tab-dashboard" class="tab-section active">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Tingkat Hunian (Okupansi)</div>
+            <div class="kpi-val" id="kpiOccupancy">75% (9/12)</div>
+            <div class="kpi-sub" id="kpiOccupancySub">2 Kamar Kosong • 1 Perbaikan</div>
+          </div>
+          <div class="kpi-card cyan">
+            <div class="kpi-label">Pemasukan Lunas Bulan Ini</div>
+            <div class="kpi-val" id="kpiRevenue">Rp 15.650.000</div>
+            <div class="kpi-sub" id="kpiRevenueSub">Sewa Pokok + Listrik kWh + Air</div>
+          </div>
+          <div class="kpi-card rose">
+            <div class="kpi-label">Tagihan Belum Bayar / Denda</div>
+            <div class="kpi-val" id="kpiUnpaid">Rp 4.785.000</div>
+            <div class="kpi-sub" id="kpiUnpaidSub" style="color:#fda4af;">3 Tagihan Aktif • Siap Kirim WA</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Laba Bersih Kost Bulan Ini</div>
+            <div class="kpi-val" id="kpiNetProfit">Rp 12.930.000</div>
+            <div class="kpi-sub" id="kpiNetProfitSub">Margin Bersih 82.6% Setelah Biaya</div>
+          </div>
+        </div>
+
+        <!-- Visual Room Grid Map -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Peta Visual Status Kamar Kost & Kontrakan (Real-Time)</div>
+              <div class="panel-subtitle">Klik tombol pada kartu kamar untuk kirim Pengingat Tagihan WA, Cetak Kwitansi, atau Kelola Kamar</div>
+            </div>
+            <div class="filter-pills" id="roomFilterBar">
+              <button class="pill active" data-filter="all" onclick="setRoomFilter('all')">Semua (12)</button>
+              <button class="pill" data-filter="terisi" onclick="setRoomFilter('terisi')">Terisi</button>
+              <button class="pill" data-filter="jatuh_tempo" onclick="setRoomFilter('jatuh_tempo')">Jatuh Tempo</button>
+              <button class="pill" data-filter="kosong" onclick="setRoomFilter('kosong')">Kosong</button>
+              <button class="pill" data-filter="perbaikan" onclick="setRoomFilter('perbaikan')">Perbaikan</button>
+            </div>
+          </div>
+          <div class="room-grid" id="roomGridContainer"></div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="dash-two-col">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Grafik Pemasukan Sewa vs Biaya Operasional & Laba Bersih (6 Bulan)</div>
+                <div class="panel-subtitle">Perbandingan arus kas bulanan & tren pertumbuhan profit kost</div>
+              </div>
+            </div>
+            <div style="width:100%;height:265px;">
+              <canvas id="profitChartCanvas" style="width:100%;height:100%;"></canvas>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Ringkasan Status Kamar & Operasional</div>
+                <div class="panel-subtitle">Distribusi tipe kamar & pengeluaran terbesar</div>
+              </div>
+            </div>
+            <div id="occupancySummaryBox"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: CRUD PENYEWA & KTP -->
+      <section id="tab-penyewa" class="tab-section">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Database Penyewa Kost, Identitas KTP & Kontak Darurat</div>
+              <div class="panel-subtitle">Kelola biodata penghuni, foto/nomor NIK KTP, deposit jaminan, dan nomor WhatsApp keluarga darurat</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <input type="text" id="searchTenantInput" placeholder="Cari nama, kamar, NIK, WA..." oninput="renderTenantsTable()" style="width:240px;" />
+              <button class="btn btn-emerald" onclick="openTenantModal()">+ Tambah Penyewa Baru</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kamar</th>
+                  <th>Nama Penyewa & Pekerjaan</th>
+                  <th>Identitas NIK & KTP</th>
+                  <th>No. WhatsApp</th>
+                  <th>Kontak Darurat</th>
+                  <th>Tgl Masuk & Deposit</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tenantsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: TAGIHAN BULANAN + LISTRIK/AIR + DENDA + WA REMINDER -->
+      <section id="tab-tagihan" class="tab-section">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Manajemen Tagihan Bulanan, Meteran Listrik/Air, Denda Otomatis & WhatsApp</div>
+              <div class="panel-subtitle">Denda keterlambatan dihitung otomatis jika melewati jatuh tempo • Kirim Pengingat WA sekali klik!</div>
+            </div>
+            <div style="display:flex;gap:9px;flex-wrap:wrap;">
+              <select id="filterBillStatus" onchange="renderBillsTable()">
+                <option value="all">Semua Status Tagihan</option>
+                <option value="unpaid">Belum Bayar / Jatuh Tempo</option>
+                <option value="paid">Sudah Lunas</option>
+              </select>
+              <button class="btn btn-cyan" onclick="openBillModal()">+ Buat Tagihan Manual</button>
+              <button class="btn btn-emerald" onclick="generateMonthlyBills()">⚡ Generate Tagihan Semua Kamar</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>No. Tagihan</th>
+                  <th>Kamar & Penyewa</th>
+                  <th>Periode & Jatuh Tempo</th>
+                  <th>Sewa Pokok</th>
+                  <th>Listrik & Air</th>
+                  <th>Denda Otomatis</th>
+                  <th>Total Tagihan</th>
+                  <th>Status</th>
+                  <th>Aksi Cepat (WA / Lunas / Kwitansi)</th>
+                </tr>
+              </thead>
+              <tbody id="billsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: CETAK KWITANSI SEWA DIGITAL / PDF RESMI -->
+      <section id="tab-kwitansi" class="tab-section">
+        <div class="kwitansi-layout">
+          <div class="panel no-print">
+            <div class="panel-title" style="margin-bottom:6px;">Pilih Tagihan & Format Kwitansi</div>
+            <div class="panel-subtitle" style="margin-bottom:14px;">Siap cetak PDF A4 resmi bertanda tangan atau Struk Thermal Bluetooth 58mm/80mm</div>
+
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Pilih Nomor Kwitansi / Penyewa</label>
+              <select id="receiptSelectBill" onchange="renderReceiptPreview()"></select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+              <label>Format Kertas Cetak</label>
+              <select id="receiptFormatMode" onchange="renderReceiptPreview()">
+                <option value="a4">Kwitansi Resmi A4 / Surat Bukti Sewa (PDF)</option>
+                <option value="thermal">Struk Kasir Thermal 58mm / 80mm</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Catatan Tambahan Kwitansi</label>
+              <input type="text" id="receiptCustomNote" value="Harap simpan bukti pembayaran resmi ini. Terima kasih atas pembayarannya." oninput="renderReceiptPreview()" />
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <button class="btn btn-emerald" onclick="window.print()" style="justify-content:center;">🖨️ Cetak Kwitansi / Simpan PDF Sekarang</button>
+              <button class="btn btn-wa" onclick="sendSelectedReceiptWa()" style="justify-content:center;">📲 Kirim Bukti / Tagihan ke WhatsApp Penyewa</button>
+            </div>
+          </div>
+
+          <div id="receiptPaperContainer"></div>
+        </div>
+      </section>
+
+      <!-- TAB 5: PENGELUARAN OPERASIONAL KOST & LABA BERSIH -->
+      <section id="tab-operasional" class="tab-section">
+        <div class="dash-two-col">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Daftar Pengeluaran Operasional Kost & Kontrakan</div>
+                <div class="panel-subtitle">Catat biaya PLN utama, PDAM, WiFi, kebersihan, gaji penjaga, dan perbaikan fasilitas</div>
+              </div>
+              <button class="btn btn-emerald" onclick="openExpenseModal()">+ Catat Pengeluaran</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Kategori</th>
+                    <th>Keterangan</th>
+                    <th>Nominal</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="expensesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:4px;">Laporan Laba Rugi Kost Bulan Ini</div>
+            <div class="panel-subtitle" style="margin-bottom:14px;">Rekapitulasi otomatis pendapatan sewa dikurangi biaya operasional</div>
+            <div id="kostProfitLossSummary"></div>
+            <button class="btn btn-cyan no-print" style="margin-top:14px;width:100%;justify-content:center;" onclick="exportBillsCsv()">📊 Export Rekap Keuangan ke CSV / Excel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: PENGATURAN KOST, EXPORT CSV & BACKUP JSON -->
+      <section id="tab-pengaturan" class="tab-section">
+        <div class="dash-two-col">
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:6px;">Profil Kost / Kontrakan & Aturan Tarif</div>
+            <div class="panel-subtitle" style="margin-bottom:16px;">Tampil otomatis di Kop Kwitansi PDF dan pesan WhatsApp pengingat tagihan</div>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label>Nama Kost / Kontrakan</label>
+                <input type="text" id="setKostName" />
+              </div>
+              <div class="form-group full">
+                <label>Alamat Lengkap</label>
+                <input type="text" id="setKostAddress" />
+              </div>
+              <div class="form-group">
+                <label>Nama Pemilik / Pengelola (TTD Kwitansi)</label>
+                <input type="text" id="setOwnerName" />
+              </div>
+              <div class="form-group">
+                <label>No. WhatsApp Pengelola</label>
+                <input type="text" id="setOwnerPhone" />
+              </div>
+              <div class="form-group full">
+                <label>Info Rekening Bank / QRIS Pembayaran (Muncul di WA & Kwitansi)</label>
+                <input type="text" id="setBankInfo" />
+              </div>
+              <div class="form-group">
+                <label>Tarif Listrik Meteran per kWh (Rp)</label>
+                <input type="number" id="setKwhRate" />
+              </div>
+              <div class="form-group">
+                <label>Denda Keterlambatan per Hari (Rp)</label>
+                <input type="number" id="setDailyFine" />
+              </div>
+            </div>
+            <button class="btn btn-emerald" style="margin-top:16px;" onclick="saveSettingsForm()">💾 Simpan Pengaturan Kost</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:6px;">Backup, Restore Database & Export Excel/CSV</div>
+            <div class="panel-subtitle" style="margin-bottom:16px;">Amankan data penyewa & tagihan dalam 1 klik atau pindahkan ke laptop lain</div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <button class="btn btn-cyan" onclick="exportBillsCsv()">📥 Export Data Tagihan & Penyewa (.CSV Excel)</button>
+              <button class="btn btn-emerald" onclick="downloadBackupJson()">💾 Download Backup Database Lengkap (.JSON)</button>
+              <div class="form-group" style="margin-top:6px;">
+                <label>Restore Database dari File Backup (.JSON)</label>
+                <input type="file" accept=".json" onchange="restoreBackupJson(event)" />
+              </div>
+              <hr style="border:none;border-top:1px solid var(--border);margin:8px 0;" />
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-amber" onclick="resetToSampleDemo()">🔄 Muat Ulang Sample Demo (12 Kamar)</button>
+                <button class="btn btn-rose" onclick="resetEmptyDatabase()">🗑️ Reset Kosong (Mulai Data Kost Baru)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: WHATSAPP REMINDER PREVIEW -->
+  <div class="modal-backdrop" id="waModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-size:17px;font-weight:800;color:#4ade80;">📲 Pengingat Tagihan WhatsApp Otomatis</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('waModal')">Tutup ✕</button>
+      </div>
+      <p style="font-size:12.5px;color:#94a3b8;margin-bottom:12px;">Template pesan sopan otomatis terisi rincian sewa, listrik/air, denda & rekening pembayaran:</p>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Nomor WhatsApp Tujuan</label>
+        <input type="text" id="waModalPhone" />
+      </div>
+      <div class="form-group" style="margin-bottom:14px;">
+        <label>Isi Pesan WhatsApp (Bisa Diedit Sebelum Kirim)</label>
+        <textarea id="waModalText" rows="10" style="font-size:12.5px;line-height:1.55;"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+        <button class="btn btn-outline" onclick="copyWaMessage()">📋 Salin Teks</button>
+        <button class="btn btn-wa" onclick="launchWaLink()">🚀 Kirim Sekarang via WhatsApp (wa.me)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT ROOM -->
+  <div class="modal-backdrop" id="roomModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="font-size:17px;font-weight:800;" id="roomModalTitle">Kelola Unit Kamar / Kontrakan</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('roomModal')">✕</button>
+      </div>
+      <input type="hidden" id="roomEditId" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Kode / Nomor Kamar (Contoh: A-01)</label>
+          <input type="text" id="roomCodeInput" placeholder="A-01" />
+        </div>
+        <div class="form-group">
+          <label>Lantai / Blok</label>
+          <select id="roomFloorInput">
+            <option value="Lantai 1">Lantai 1</option>
+            <option value="Lantai 2">Lantai 2</option>
+            <option value="Kontrakan Petak">Kontrakan Petak</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tipe Kamar & Fasilitas</label>
+          <input type="text" id="roomTypeInput" placeholder="VIP AC + KM Dalam + WiFi" />
+        </div>
+        <div class="form-group">
+          <label>Tarif Sewa Bulanan (Rp)</label>
+          <input type="number" id="roomPriceInput" placeholder="1650000" />
+        </div>
+        <div class="form-group">
+          <label>Status Kamar</label>
+          <select id="roomStatusInput">
+            <option value="kosong">Kosong (Siap Huni)</option>
+            <option value="terisi">Terisi Aktif</option>
+            <option value="jatuh_tempo">Jatuh Tempo Pembayaran</option>
+            <option value="perbaikan">Sedang Perbaikan / Renovasi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stand Meter Listrik Terakhir (kWh)</label>
+          <input type="number" id="roomLastKwhInput" value="1200" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:18px;">
+        <button class="btn btn-rose btn-sm" id="btnDeleteRoom" onclick="deleteRoomFromModal()" style="display:none;">Hapus Kamar</button>
+        <div style="display:flex;gap:8px;margin-left:auto;">
+          <button class="btn btn-outline" onclick="closeModal('roomModal')">Batal</button>
+          <button class="btn btn-emerald" onclick="saveRoomModal()">Simpan Kamar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT TENANT + KTP -->
+  <div class="modal-backdrop" id="tenantModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="font-size:17px;font-weight:800;">Data Penyewa, KTP & Kontak Darurat</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('tenantModal')">✕</button>
+      </div>
+      <input type="hidden" id="tenantEditId" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nama Lengkap Sesuai KTP</label>
+          <input type="text" id="tenName" placeholder="Contoh: Raka Pratama Putra" />
+        </div>
+        <div class="form-group">
+          <label>Nomor NIK KTP (16 Digit)</label>
+          <input type="text" id="tenNik" placeholder="3174051208990002" />
+        </div>
+        <div class="form-group">
+          <label>Pilih Kamar yang Ditempati</label>
+          <select id="tenRoomCode"></select>
+        </div>
+        <div class="form-group">
+          <label>Nomor WhatsApp Aktif (Format 08 / 628)</label>
+          <input type="text" id="tenPhone" placeholder="081288997766" />
+        </div>
+        <div class="form-group">
+          <label>Pekerjaan / Kampus / Instansi</label>
+          <input type="text" id="tenJob" placeholder="Karyawan Swasta - Sudirman" />
+        </div>
+        <div class="form-group">
+          <label>Tanggal Masuk & Jatuh Tempo Bulanan</label>
+          <input type="date" id="tenCheckIn" />
+        </div>
+        <div class="form-group">
+          <label>Uang Deposit Jaminan (Rp)</label>
+          <input type="number" id="tenDeposit" value="500000" />
+        </div>
+        <div class="form-group">
+          <label>Upload Foto KTP (Opsional - Tersimpan Lokal)</label>
+          <input type="file" accept="image/*" onchange="handleKtpUpload(event)" />
+        </div>
+        <div class="form-group full">
+          <div class="ktp-preview-box" id="tenKtpPreview">Kartu Identitas KTP Terverifikasi Sistem • Upload foto untuk melampirkan scan KTP</div>
+        </div>
+        <div class="form-group">
+          <label>Nama Kontak Darurat (Orang Tua / Wali)</label>
+          <input type="text" id="tenEmergName" placeholder="Bpk. Hendra Wijaya (Ayah)" />
+        </div>
+        <div class="form-group">
+          <label>No. WA Kontak Darurat</label>
+          <input type="text" id="tenEmergPhone" placeholder="081399881122" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
+        <button class="btn btn-outline" onclick="closeModal('tenantModal')">Batal</button>
+        <button class="btn btn-emerald" onclick="saveTenantModal()">Simpan Data Penyewa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE / EDIT BILL -->
+  <div class="modal-backdrop" id="billModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="font-size:17px;font-weight:800;">Buat / Edit Tagihan Sewa, Listrik & Air</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('billModal')">✕</button>
+      </div>
+      <input type="hidden" id="billEditId" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Pilih Penyewa / Kamar</label>
+          <select id="billTenantSelect" onchange="prefillBillFromTenant()"></select>
+        </div>
+        <div class="form-group">
+          <label>Periode Bulan Tagihan</label>
+          <input type="text" id="billPeriod" value="November 2026" />
+        </div>
+        <div class="form-group">
+          <label>Tanggal Jatuh Tempo (Penentu Denda Otomatis)</label>
+          <input type="date" id="billDueDate" />
+        </div>
+        <div class="form-group">
+          <label>Sewa Pokok Kamar (Rp)</label>
+          <input type="number" id="billBaseRent" />
+        </div>
+        <div class="form-group">
+          <label>Pemakaian Listrik (kWh Bulan Ini)</label>
+          <input type="number" id="billKwhUsed" value="85" oninput="recalcBillModalElectric()" />
+        </div>
+        <div class="form-group">
+          <label>Biaya Listrik (Rp)</label>
+          <input type="number" id="billElectricCost" value="144500" />
+        </div>
+        <div class="form-group">
+          <label>Biaya Air PDAM & Kebersihan (Rp)</label>
+          <input type="number" id="billWaterCost" value="50000" />
+        </div>
+        <div class="form-group">
+          <label>Potongan Diskon (Rp)</label>
+          <input type="number" id="billDiscount" value="0" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
+        <button class="btn btn-outline" onclick="closeModal('billModal')">Batal</button>
+        <button class="btn btn-emerald" onclick="saveBillModal()">Simpan Tagihan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EXPENSE -->
+  <div class="modal-backdrop" id="expenseModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="font-size:17px;font-weight:800;">Catat Pengeluaran Operasional Kost</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('expenseModal')">✕</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tanggal</label>
+          <input type="date" id="expDate" />
+        </div>
+        <div class="form-group">
+          <label>Kategori Biaya</label>
+          <select id="expCategory">
+            <option value="Listrik PLN Utama">Listrik PLN Utama / Token Area Umum</option>
+            <option value="Air PDAM & Pompa">Air PDAM & Perawatan Pompa</option>
+            <option value="Internet WiFi">Internet WiFi Kost</option>
+            <option value="Gaji Penjaga & Kebersihan">Gaji Penjaga & Kebersihan</option>
+            <option value="Perbaikan Kamar & AC">Perbaikan Kamar, Cuci AC & Tukang</option>
+            <option value="Keamanan & Iuran RT/RW">Keamanan & Iuran Lingkungan</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Keterangan Pengeluaran</label>
+          <input type="text" id="expDesc" placeholder="Contoh: Cuci AC rutin 6 kamar lantai 1 & tambah freon" />
+        </div>
+        <div class="form-group full">
+          <label>Nominal Biaya (Rp)</label>
+          <input type="number" id="expAmount" placeholder="450000" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
+        <button class="btn btn-outline" onclick="closeModal('expenseModal')">Batal</button>
+        <button class="btn btn-emerald" onclick="saveExpenseModal()">Simpan Pengeluaran</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
