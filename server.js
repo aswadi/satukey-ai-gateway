@@ -45,7 +45,8 @@ const BUYER_TOKEN_MAP = {
   'PROMPTER-4H8J-2D7F-ASWADI': '4_CleanPrompter_AI_Studio_Pro_Full_Source_Code.zip',
   'ERP5IN1-7Z9C-3B6M-ASWADI': '5_Paket_Lengkap_ERP_Kasir_Klinik_CRM_Toko_Online_Full_Source_Code.zip',
   'FINANCE-5K8M-2P9R-ASWADI': '6_Aplikasi_Pembukuan_Keuangan_UMKM_Laba_Rugi_Invoice_Full_Source_Code.zip',
-  'KOST-3N7V-8Q4L-ASWADI': '7_Aplikasi_Manajemen_Kost_Kontrakan_Pro.zip'
+  'KOST-3N7V-8Q4L-ASWADI': '7_Aplikasi_Manajemen_Kost_Kontrakan_Pro.zip',
+  'LAUNDRY-9P2W-6T5X-ASWADI': '8_Aplikasi_Kasir_Laundry_Kiloan_Satuan_Nota_Thermal_WA_Full_Source_Code.zip'
 };
 
 app.get('/api/buyer-download', (req, res) => {

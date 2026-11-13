@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CleanWash POS Pro v4.8 — Aplikasi Kasir Laundry Kiloan & Satuan, Nota Thermal Bluetooth & Notif WA</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand-box">
+          <div class="brand-logo">CW</div>
+          <div>
+            <div class="brand-title" id="sidebarStoreName">CleanWash Express</div>
+            <div class="brand-sub">Kasir Laundry Pro v4.8</div>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+            <span>01 • Input Order & Kasir</span>
+            <span style="font-size:11px;color:#34d399;">POS</span>
+          </button>
+          <button class="nav-btn" data-tab="kanban" onclick="switchTab('kanban')">
+            <span>02 • Tracking Status Cucian</span>
+            <span class="nav-badge" id="badgeActiveOrders">7</span>
+          </button>
+          <button class="nav-btn" data-tab="nota" onclick="switchTab('nota')">
+            <span>03 • Nota Thermal 58/80 & WA</span>
+          </button>
+          <button class="nav-btn" data-tab="member" onclick="switchTab('member')">
+            <span>04 • Deposit Paket Member</span>
+          </button>
+          <button class="nav-btn" data-tab="laporan" onclick="switchTab('laporan')">
+            <span>05 • Pengeluaran & Omset</span>
+          </button>
+          <button class="nav-btn" data-tab="pengaturan" onclick="switchTab('pengaturan')">
+            <span>06 • Pengaturan, CSV & Backup</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:3px;">Printer Bluetooth / USB Ready</div>
+        <div id="syncStatusText" style="color:#34d399;font-weight:600;">Database Tersimpan Otomatis</div>
+        <div style="margin-top:8px;">Full Source Code • Tanpa Biaya Bulanan</div>
+      </div>
+    </aside>
+
+    <!-- Main Area -->
+    <main class="main-area">
+      <header class="topbar">
+        <div>
+          <h1 id="headerStoreTitle">CleanWash Laundry Kiloan, Express & Dry Clean</h1>
+          <div class="topbar-sub" id="headerStoreSub">Jl. Kemang Pratama Raya No. 14 • Kasir Kiloan/Satuan, Tracking Rak, Struk Thermal 58mm/80mm & Notifikasi WA</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" onclick="switchTab('kanban')">🧺 Lihat Antrian Cucian</button>
+          <button class="btn btn-cyan" onclick="openMemberModal()">+ Member Deposit Baru</button>
+          <button class="btn btn-emerald" onclick="switchTab('dashboard'); document.getElementById('ordCustName').focus();">+ Order Cucian Cepat</button>
+        </div>
+      </header>
+
+      <!-- TAB 1: POS INPUT ORDER CEPAT & DASHBOARD -->
+      <section id="tab-dashboard" class="tab-section active">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Omset Laundry Bulan Ini</div>
+            <div class="kpi-val" id="kpiOmset">Rp 14.865.000</div>
+            <div class="kpi-sub" id="kpiOmsetSub">Hari Ini: Rp 845.000 • 9 Order</div>
+          </div>
+          <div class="kpi-card cyan">
+            <div class="kpi-label">Sedang Diproses (Antri/Cuci/Setrika)</div>
+            <div class="kpi-val" id="kpiProcessing">5 Cucian</div>
+            <div class="kpi-sub" id="kpiProcessingSub">2 Paket Express Kilat Prioritas</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Siap Diambil di Rak</div>
+            <div class="kpi-val" id="kpiReadyPickup">2 Cucian</div>
+            <div class="kpi-sub" id="kpiReadyPickupSub">Klik Kirim Notif WA Selesai!</div>
+          </div>
+          <div class="kpi-card violet">
+            <div class="kpi-label">Laba Bersih Operasional</div>
+            <div class="kpi-val" id="kpiNetProfit">Rp 11.420.000</div>
+            <div class="kpi-sub" id="kpiNetProfitSub">Saldo Deposit Member: Rp 2.650.000</div>
+          </div>
+        </div>
+
+        <div class="pos-grid">
+          <!-- Left: Fast Laundry Order Input -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">⚡ Input Order Cepat — Kiloan, Satuan, Express & Dry Clean</div>
+                <div class="panel-subtitle">Pilih layanan, berat/jumlah & parfum — estimasi selesai terhitung otomatis!</div>
+              </div>
+            </div>
+
+            <div class="service-catalog" id="serviceCatalogGrid"></div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Pilih Member / Pelanggan Terdaftar (Opsional)</label>
+                <select id="ordMemberSelect" onchange="applyMemberToOrderForm()">
+                  <option value="">-- Pelanggan Umum / Baru --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Nama Pelanggan</label>
+                <input type="text" id="ordCustName" placeholder="Contoh: Ibu Rina Wulandari" />
+              </div>
+              <div class="form-group">
+                <label>Nomor WhatsApp Pelanggan (Untuk Notif Otomatis)</label>
+                <input type="text" id="ordCustPhone" placeholder="081288776655" />
+              </div>
+              <div class="form-group">
+                <label id="ordQtyLabel">Berat Cucian (Kg) / Jumlah (Pcs)</label>
+                <input type="number" step="0.1" id="ordQty" value="5" oninput="recalcOrderPreview()" />
+              </div>
+              <div class="form-group">
+                <label>Pilihan Aroma Parfum Premium</label>
+                <select id="ordPerfume">
+                  <option value="Sakura Blossom">🌸 Sakura Blossom (Best Seller)</option>
+                  <option value="Snappy Luxury">✨ Snappy Luxury Fresh</option>
+                  <option value="Ocean Breeze">🌊 Ocean Breeze</option>
+                  <option value="Downy Mystique">💜 Downy Mystique</option>
+                  <option value="Lavender Baby">🌿 Lavender Baby Hypoallergenic</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Lokasi Rak / Keranjang</label>
+                <select id="ordRack">
+                  <option value="Rak A-01">Rak A-01 (Reguler)</option>
+                  <option value="Rak A-02">Rak A-02 (Reguler)</option>
+                  <option value="Rak EX-01">Rak EX-01 (Express Kilat)</option>
+                  <option value="Rak G-03">Rak G-03 (Gantung Jas/Satuan)</option>
+                  <option value="Rak B-04">Rak B-04 (Bedcover Besar)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Metode & Status Pembayaran</label>
+                <select id="ordPaymentStatus" onchange="recalcOrderPreview()">
+                  <option value="paid_tunai">LUNAS — Tunai Kasir</option>
+                  <option value="paid_qris">LUNAS — Scan QRIS / Transfer</option>
+                  <option value="paid_deposit">LUNAS — Potong Saldo Deposit Member</option>
+                  <option value="unpaid">BELUM LUNAS — Bayar Saat Ambil</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Diskon / Promo Voucher (Rp)</label>
+                <input type="number" id="ordDiscount" value="0" oninput="recalcOrderPreview()" />
+              </div>
+              <div class="form-group full">
+                <label>Catatan Cucian (Pisah Luntur / Tanpa Pelembut / Antar Jemput)</label>
+                <input type="text" id="ordNotes" placeholder="Contoh: Kemeja putih dipisah, lipat rapi" />
+              </div>
+            </div>
+
+            <div style="margin-top:14px;background:#07101e;border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+              <div>
+                <div style="font-size:11.5px;color:#94a3b8;" id="ordEstFinishText">Estimasi Selesai: 15 Nov 2026 09:00</div>
+                <div style="font-size:21px;font-weight:900;color:#34d399;" id="ordTotalPreview">Rp 37.500</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-emerald" onclick="submitNewLaundryOrder(true)">🖨️ Simpan & Cetak Nota Thermal</button>
+                <button class="btn btn-wa" onclick="submitNewLaundryOrder(false, true)">📲 Simpan & Kirim Struk WA</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Revenue Chart & Recent Ready Queue -->
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div class="panel" style="margin-bottom:0;">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Grafik Omset Harian & Laba Bersih Laundry (7 Hari Terakhir)</div>
+                  <div class="panel-subtitle">Pantau performa transaksi kiloan, express & satuan secara real-time</div>
+                </div>
+              </div>
+              <div style="width:100%;height:225px;">
+                <canvas id="laundryChartCanvas" style="width:100%;height:100%;"></canvas>
+              </div>
+            </div>
+
+            <div class="panel" style="margin-bottom:0;">
+              <div class="panel-header" style="margin-bottom:10px;">
+                <div>
+                  <div class="panel-title">Cucian Siap Ambil & Express Prioritas</div>
+                  <div class="panel-subtitle">Klik tombol WA untuk panggil pelanggan ambil cucian!</div>
+                </div>
+              </div>
+              <div id="quickReadyList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: KANBAN STATUS TRACKING CUCIAN -->
+      <section id="tab-kanban" class="tab-section">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Tracking Status Cucian Real-Time (Antrian → Dicuci → Disetrika → Siap Ambil → Selesai)</div>
+              <div class="panel-subtitle">Geser status cucian sekali klik — saat masuk "Siap Ambil", kirim Notifikasi WA Otomatis ke pelanggan!</div>
+            </div>
+            <input type="text" id="kanbanSearchInput" placeholder="Cari No. Nota, Pelanggan, Rak..." oninput="renderKanbanBoard()" style="width:250px;" />
+          </div>
+          <div class="kanban-board" id="kanbanBoardContainer"></div>
+        </div>
+      </section>
+
+      <!-- TAB 3: CETAK NOTA THERMAL 58MM/80MM & WHATSAPP -->
+      <section id="tab-nota" class="tab-section">
+        <div class="nota-layout">
+          <div class="panel no-print">
+            <div class="panel-title" style="margin-bottom:6px;">Cetak Struk Thermal Bluetooth / USB & Kirim WA</div>
+            <div class="panel-subtitle" style="margin-bottom:14px;">Kompatibel semua printer kasir thermal 58mm, 80mm, maupun printer A4</div>
+
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Pilih Nomor Nota Order</label>
+              <select id="notaSelectOrder" onchange="renderThermalReceipt()"></select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+              <label>Ukuran Kertas Printer</label>
+              <select id="notaPaperWidth" onchange="renderThermalReceipt()">
+                <option value="w58">Printer Kasir Thermal Bluetooth 58mm</option>
+                <option value="w80">Printer Kasir Thermal 80mm</option>
+                <option value="wa4">Nota Invoice Laundry Resmi A4 / PDF</option>
+              </select>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <button class="btn btn-emerald" style="justify-content:center;" onclick="window.print()">🖨️ Cetak Struk Thermal / Simpan PDF</button>
+              <button class="btn btn-wa" style="justify-content:center;" onclick="openWaForSelectedNota('order')">📲 Kirim Struk Masuk via WhatsApp</button>
+              <button class="btn btn-cyan" style="justify-content:center;" onclick="openWaForSelectedNota('ready')">✨ Kirim Notif "Cucian Selesai Siap Ambil" via WA</button>
+            </div>
+          </div>
+
+          <div id="thermalPreviewContainer"></div>
+        </div>
+      </section>
+
+      <!-- TAB 4: DEPOSIT PAKET MEMBER PELANGGAN -->
+      <section id="tab-member" class="tab-section">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Manajemen Deposit Saldo & Paket Member Pelanggan Laundry</div>
+              <div class="panel-subtitle">Tingkatkan pelanggan langganan tetap dengan sistem saldo deposit & diskon member otomatis</div>
+            </div>
+            <button class="btn btn-emerald" onclick="openMemberModal()">+ Tambah / Top-Up Member</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID Member</th>
+                  <th>Nama Pelanggan</th>
+                  <th>No. WhatsApp</th>
+                  <th>Alamat Antar-Jemput</th>
+                  <th>Paket Member</th>
+                  <th>Saldo Deposit</th>
+                  <th>Poin Loyalitas</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="membersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: PENGELUARAN OPERASIONAL & LAPORAN OMSET -->
+      <section id="tab-laporan" class="tab-section">
+        <div class="pos-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Biaya Operasional Laundry (Deterjen, Parfum, Gas, PLN, Gaji)</div>
+                <div class="panel-subtitle">Catat semua belanja bahan baku agar laba bersih laundry akurat</div>
+              </div>
+              <button class="btn btn-emerald" onclick="openExpenseModal()">+ Catat Biaya</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Kategori</th>
+                    <th>Keterangan</th>
+                    <th>Nominal</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="expensesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:4px;">Rekap Laporan Omset & Laba Bersih Laundry</div>
+            <div class="panel-subtitle" style="margin-bottom:14px;">Ringkasan pemasukan lunas, piutang belum diambil, dan margin usaha</div>
+            <div id="laundryReportSummary"></div>
+            <button class="btn btn-cyan" style="margin-top:14px;width:100%;justify-content:center;" onclick="exportOrdersCsv()">📊 Export Laporan Order ke Excel (.CSV)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: PENGATURAN, CSV & BACKUP JSON -->
+      <section id="tab-pengaturan" class="tab-section">
+        <div class="pos-grid">
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:6px;">Profil Outlet Laundry & Catatan Kaki Struk</div>
+            <div class="panel-subtitle" style="margin-bottom:14px;">Otomatis tampil pada cetakan Nota Thermal Bluetooth dan pesan WhatsApp</div>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label>Nama Usaha Laundry</label>
+                <input type="text" id="setStoreName" />
+              </div>
+              <div class="form-group full">
+                <label>Alamat Lengkap Outlet</label>
+                <input type="text" id="setStoreAddress" />
+              </div>
+              <div class="form-group">
+                <label>Nomor WhatsApp Outlet / Kasir</label>
+                <input type="text" id="setStorePhone" />
+              </div>
+              <div class="form-group">
+                <label>Info Pembayaran QRIS / Rekening</label>
+                <input type="text" id="setBankInfo" />
+              </div>
+              <div class="form-group full">
+                <label>Catatan Syarat & Ketentuan di Bawah Struk</label>
+                <input type="text" id="setReceiptFooter" />
+              </div>
+            </div>
+            <button class="btn btn-emerald" style="margin-top:14px;" onclick="saveSettings()">💾 Simpan Profil Outlet</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:6px;">Export Excel (.CSV) & Backup / Restore Database (.JSON)</div>
+            <div class="panel-subtitle" style="margin-bottom:14px;">Data aman 100% tersimpan lokal & dapat dipindahkan antar perangkat</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-cyan" onclick="exportOrdersCsv()">📥 Download Rekap Transaksi Laundry (.CSV Excel)</button>
+              <button class="btn btn-emerald" onclick="downloadBackupJson()">💾 Backup Database Lengkap (.JSON)</button>
+              <div class="form-group" style="margin-top:6px;">
+                <label>Restore Database dari File (.JSON)</label>
+                <input type="file" accept=".json" onchange="restoreBackupJson(event)" />
+              </div>
+              <hr style="border:none;border-top:1px solid var(--border);margin:8px 0;" />
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-amber" onclick="resetSampleData()">🔄 Muat Ulang Data Contoh</button>
+                <button class="btn btn-rose" onclick="resetEmptyData()">🗑️ Reset Data Kosong (Mulai Usaha Baru)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: WHATSAPP STRUK & NOTIF SELESAI -->
+  <div class="modal-backdrop" id="waModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-size:16.5px;font-weight:800;color:#4ade80;">📲 Kirim Nota Digital & Notifikasi WhatsApp</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('waModal')">✕</button>
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Nomor WhatsApp Pelanggan</label>
+        <input type="text" id="waPhoneInput" />
+      </div>
+      <div class="form-group" style="margin-bottom:14px;">
+        <label>Isi Pesan Struk / Notifikasi Cucian Selesai</label>
+        <textarea id="waTextInput" rows="10" style="font-size:12.5px;line-height:1.5;"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-outline" onclick="copyWaText()">📋 Salin Pesan</button>
+        <button class="btn btn-wa" onclick="sendWaNow()">🚀 Kirim via WhatsApp Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MEMBER DEPOSIT -->
+  <div class="modal-backdrop" id="memberModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="font-size:16.5px;font-weight:800;">Tambah / Top-Up Deposit Member Pelanggan</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('memberModal')">✕</button>
+      </div>
+      <input type="hidden" id="memEditId" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nama Lengkap Member</label>
+          <input type="text" id="memName" placeholder="Ibu Clarissa Wijaya" />
+        </div>
+        <div class="form-group">
+          <label>Nomor WhatsApp</label>
+          <input type="text" id="memPhone" placeholder="081299887744" />
+        </div>
+        <div class="form-group full">
+          <label>Alamat Antar-Jemput (Delivery)</label>
+          <input type="text" id="memAddress" placeholder="Cluster Emerald Blok C2 No. 9" />
+        </div>
+        <div class="form-group">
+          <label>Tipe Paket Member</label>
+          <select id="memTier">
+            <option value="Gold Deposit">Gold Deposit (Prioritas + Parfum Gratis)</option>
+            <option value="Paket Keluarga 50Kg">Paket Keluarga Bulanan</option>
+            <option value="Member Reguler">Member Reguler</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Saldo Deposit Aktif (Rp)</label>
+          <input type="number" id="memBalance" value="250000" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+        <button class="btn btn-outline" onclick="closeModal('memberModal')">Batal</button>
+        <button class="btn btn-emerald" onclick="saveMemberModal()">Simpan Member</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EXPENSE -->
+  <div class="modal-backdrop" id="expenseModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="font-size:16.5px;font-weight:800;">Catat Pengeluaran Operasional Laundry</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('expenseModal')">✕</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tanggal</label>
+          <input type="date" id="expDate" />
+        </div>
+        <div class="form-group">
+          <label>Kategori Biaya</label>
+          <select id="expCategory">
+            <option value="Deterjen & Chemical">Deterjen Cair, Softener & Anti Noda</option>
+            <option value="Bibit Parfum Laundry">Bibit Parfum Grade A & Methanol</option>
+            <option value="Listrik PLN & Air">Token Listrik Mesin Dryer & Air</option>
+            <option value="Gas LPG Setrika Uap">Gas LPG Boiler Setrika Uap</option>
+            <option value="Plastik Packing & Hanger">Plastik Packing, Lakban & Hanger</option>
+            <option value="Gaji Karyawan Cuci/Setrika">Gaji & Komisi Karyawan</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Keterangan Belanja</label>
+          <input type="text" id="expDesc" placeholder="Contoh: Beli 4 Jerigen Deterjen Liquid 5L + Bibit Sakura 2L" />
+        </div>
+        <div class="form-group full">
+          <label>Nominal Biaya (Rp)</label>
+          <input type="number" id="expAmount" placeholder="385000" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+        <button class="btn btn-outline" onclick="closeModal('expenseModal')">Batal</button>
+        <button class="btn btn-emerald" onclick="saveExpenseModal()">Simpan Biaya</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
